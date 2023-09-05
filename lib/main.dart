@@ -648,20 +648,6 @@ Widget build(BuildContext context) {
               ),
           ],
         ),
-        Padding(
-          padding: EdgeInsets.all(8),
-          child: Text(
-            'Tổng số lượng răng: ${totalQuantity.toString()}',
-            style: TextStyle(fontWeight: FontWeight.bold,color: Colors.red),
-          ),
-        ),
-          Padding(
-          padding: EdgeInsets.only(bottom: 20),
-          child: Text(
-            'Tổng tiền nhận được: $formattedTotalMoney VND',
-            style: TextStyle(fontWeight: FontWeight.bold,color: Color.fromARGB(255, 34, 218, 80)),
-          ),
-        ),
       ],
     ),
   ),
@@ -716,6 +702,20 @@ class _ThemDoanhThuScreenState extends State<themdoanhthu> {
   TextEditingController soluong = TextEditingController();
   TextEditingController thoigiannhanviec = TextEditingController();
 
+  List<dynamic> congDoanList = [];
+  Future<void> fetchData() async {
+    final response = await http.get(Uri.parse('https://buffquat13.000webhostapp.com/congdoanlab.php'));
+
+    if (response.statusCode == 200) {
+      setState(() {
+        congDoanList = json.decode(response.body);
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+  
+
   bool _isRed = false;
   double _scale = 1.0;
 
@@ -763,6 +763,7 @@ class _ThemDoanhThuScreenState extends State<themdoanhthu> {
   @override
   void initState() {
     super.initState();
+    fetchData();
     setNgayNhapPhieu();
 
   }
@@ -1042,16 +1043,21 @@ class _ThemDoanhThuScreenState extends State<themdoanhthu> {
     ),
               ),
             ),
-Row(
-   mainAxisAlignment: MainAxisAlignment.center,
-  children: [
-    GestureDetector(
+Wrap(
+  alignment: WrapAlignment.center,
+  spacing: 8.0, // Khoảng cách giữa các mục
+  runSpacing: 8.0, // Khoảng cách giữa các dòng
+  children: congDoanList.map((congDoan) {
+    final tenCongDoan = congDoan['tencongdoan'];
+    final isSelected = selectedOptions.contains(tenCongDoan);
+
+    return GestureDetector(
       onTap: () {
         setState(() {
-          if (selectedOptions.contains("Vào mẫu")) {
-            selectedOptions.remove("Vào mẫu");
+          if (isSelected) {
+            selectedOptions.remove(tenCongDoan);
           } else {
-            selectedOptions.add("Vào mẫu");
+            selectedOptions.add(tenCongDoan);
           }
         });
       },
@@ -1061,13 +1067,13 @@ Row(
             alignment: Alignment.bottomRight,
             children: [
               Transform.scale(
-                scale: selectedOptions.contains("Vào mẫu") ? _scale : _scale1,
+                scale: isSelected ? _scale : _scale1,
                 child: Container(
                   width: 50,
                   height: 50,
                   margin: EdgeInsets.only(top: 15),
                   decoration: BoxDecoration(
-                    color: selectedOptions.contains("Vào mẫu")
+                    color: isSelected
                         ? Color.fromARGB(255, 81, 196, 85)
                         : Color.fromARGB(255, 255, 255, 255),
                     borderRadius: BorderRadius.circular(10),
@@ -1078,9 +1084,9 @@ Row(
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    "Vào mẫu",
+                    tenCongDoan,
                     style: TextStyle(
-                      color: selectedOptions.contains("Vào mẫu")
+                      color: isSelected
                           ? Color.fromARGB(255, 81, 196, 85)
                           : Colors.white,
                       fontSize: 10,
@@ -1088,7 +1094,7 @@ Row(
                   ),
                 ),
               ),
-              if (selectedOptions.contains("Vào mẫu"))
+              if (isSelected)
                 Container(
                   width: 16,
                   height: 16,
@@ -1108,7 +1114,7 @@ Row(
           ),
           SizedBox(height: 8),
           Text(
-            'Vào mẫu',
+            tenCongDoan,
             style: TextStyle(
               color: Color.fromARGB(255, 81, 196, 85),
               fontSize: 9,
@@ -1118,313 +1124,12 @@ Row(
           ),
         ],
       ),
-    ),
-    SizedBox(width: 12),
-    GestureDetector(
-      onTap: () {
-        setState(() {
-          if (selectedOptions.contains("Đường hoàn tất")) {
-            selectedOptions.remove("Đường hoàn tất");
-          } else {
-            selectedOptions.add("Đường hoàn tất");
-          }
-        });
-      },
-      child: Column(
-        children: [
-          Stack(
-            alignment: Alignment.bottomRight,
-            children: [
-              Transform.scale(
-                scale: selectedOptions.contains("Đường hoàn tất") ? _scale : _scale1,
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  margin: EdgeInsets.only(top: 15),
-                  decoration: BoxDecoration(
-                    color: selectedOptions.contains("Đường hoàn tất")
-                        ? Color.fromARGB(255, 81, 196, 85)
-                        : Color.fromARGB(255, 255, 255, 255),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: Color.fromARGB(255, 81, 196, 85),
-                      width: 1,
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Đường hoàn tất",
-                    style: TextStyle(
-                      color: selectedOptions.contains("Đường hoàn tất")
-                          ? Color.fromARGB(255, 81, 196, 85)
-                          : Colors.white,
-                      fontSize: 10,
-                    ),
-                  ),
-                ),
-              ),
-              if (selectedOptions.contains("Đường hoàn tất"))
-                Container(
-                  width: 16,
-                  height: 16,
-                  margin: EdgeInsets.only(bottom: 2, right: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  alignment: Alignment.center,
-                  child: Icon(
-                    Icons.check,
-                    size: 12,
-                    color: Color.fromARGB(255, 81, 196, 85),
-                  ),
-                ),
-            ],
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Đường hoàn tất',
-            style: TextStyle(
-              color: Color.fromARGB(255, 81, 196, 85),
-              fontSize: 9,
-              fontFamily: 'SFUFUTURABOOK',
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    ),
-    SizedBox(width: 12),
-    GestureDetector(
-      onTap: () {
-        setState(() {
-          if (selectedOptions.contains("Scan")) {
-            selectedOptions.remove("Scan");
-          } else {
-            selectedOptions.add("Scan");
-          }
-        });
-      },
-      child: Column(
-        children: [
-          Stack(
-            alignment: Alignment.bottomRight,
-            children: [
-              Transform.scale(
-                scale: selectedOptions.contains("Scan") ? _scale : _scale1,
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  margin: EdgeInsets.only(top: 15),
-                  decoration: BoxDecoration(
-                    color: selectedOptions.contains("Scan")
-                        ? Color.fromARGB(255, 81, 196, 85)
-                        : Color.fromARGB(255, 255, 255, 255),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: Color.fromARGB(255, 81, 196, 85),
-                      width: 1,
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Scan",
-                    style: TextStyle(
-                      color: selectedOptions.contains("Scan")
-                          ? Color.fromARGB(255, 81, 196, 85)
-                          : Colors.white,
-                      fontSize: 10,
-                    ),
-                  ),
-                ),
-              ),
-              if (selectedOptions.contains("Scan"))
-                Container(
-                  width: 16,
-                  height: 16,
-                  margin: EdgeInsets.only(bottom: 2, right: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  alignment: Alignment.center,
-                  child: Icon(
-                    Icons.check,
-                    size: 12,
-                    color: Color.fromARGB(255, 81, 196, 85),
-                  ),
-                ),
-            ],
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Scan',
-            style: TextStyle(
-              color: Color.fromARGB(255, 81, 196, 85),
-              fontSize: 9,
-              fontFamily: 'SFUFUTURABOOK',
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    ),
-    SizedBox(width: 12),
-    GestureDetector(
-      onTap: () {
-        setState(() {
-          if (selectedOptions.contains("Design")) {
-            selectedOptions.remove("Design");
-          } else {
-            selectedOptions.add("Design");
-          }
-        });
-      },
-      child: Column(
-        children: [
-          Stack(
-            alignment: Alignment.bottomRight,
-            children: [
-              Transform.scale(
-                scale: selectedOptions.contains("Design") ? _scale : _scale1,
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  margin: EdgeInsets.only(top: 15),
-                  decoration: BoxDecoration(
-                    color: selectedOptions.contains("Design")
-                        ? Color.fromARGB(255, 81, 196, 85)
-                        : Color.fromARGB(255, 255, 255, 255),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: Color.fromARGB(255, 81, 196, 85),
-                      width: 1,
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Design",
-                    style: TextStyle(
-                      color: selectedOptions.contains("Design")
-                          ? Color.fromARGB(255, 81, 196, 85)
-                          : Colors.white,
-                      fontSize: 10,
-                    ),
-                  ),
-                ),
-              ),
-              if (selectedOptions.contains("Design"))
-                Container(
-                  width: 16,
-                  height: 16,
-                  margin: EdgeInsets.only(bottom: 2, right: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  alignment: Alignment.center,
-                  child: Icon(
-                    Icons.check,
-                    size: 12,
-                    color: Color.fromARGB(255, 81, 196, 85),
-                  ),
-                ),
-            ],
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Design',
-            style: TextStyle(
-              color: Color.fromARGB(255, 81, 196, 85),
-              fontSize: 9,
-              fontFamily: 'SFUFUTURABOOK',
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    ),
-    SizedBox(width: 12),
-    GestureDetector(
-      onTap: () {
-        setState(() {
-          if (selectedOptions.contains("Cắt")) {
-            selectedOptions.remove("Cắt");
-          } else {
-            selectedOptions.add("Cắt");
-          }
-        });
-      },
-      child: Column(
-        children: [
-          Stack(
-            alignment: Alignment.bottomRight,
-            children: [
-              Transform.scale(
-                scale: selectedOptions.contains("Cắt") ? _scale : _scale1,
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  margin: EdgeInsets.only(top: 15),
-                  decoration: BoxDecoration(
-                    color: selectedOptions.contains("Cắt")
-                        ? Color.fromARGB(255, 81, 196, 85)
-                        : Color.fromARGB(255, 255, 255, 255),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: Color.fromARGB(255, 81, 196, 85),
-                      width: 1,
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Cắt",
-                    style: TextStyle(
-                      color: selectedOptions.contains("Cắt")
-                          ? Color.fromARGB(255, 81, 196, 85)
-                          : Colors.white,
-                      fontSize: 10,
-                    ),
-                  ),
-                ),
-              ),
-              if (selectedOptions.contains("Cắt"))
-                Container(
-                  width: 16,
-                  height: 16,
-                  margin: EdgeInsets.only(bottom: 2, right: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  alignment: Alignment.center,
-                  child: Icon(
-                    Icons.check,
-                    size: 12,
-                    color: Color.fromARGB(255, 81, 196, 85),
-                  ),
-                ),
-            ],
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Cắt',
-            style: TextStyle(
-              color: Color.fromARGB(255, 81, 196, 85),
-              fontSize: 9,
-              fontFamily: 'SFUFUTURABOOK',
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    ),
-  ],
+    );
+  }).toList(),
 ),
 
-
-
-            SizedBox(height: 10),
+    
+       SizedBox(height: 10),
             TextFormField(
               controller: tensanpham,
               decoration: InputDecoration(labelText: 'Tên sản phẩm'),
