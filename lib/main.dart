@@ -19,7 +19,7 @@ void main() {
        '/doanh thu công việc': (context) => doanhthucongviec(userId: ModalRoute.of(context)!.settings.arguments as String,title: ModalRoute.of(context)!.settings.arguments as String ),
   '/máy móc': (context) => maymoc(userId: ModalRoute.of(context)!.settings.arguments as String),
   '/dụng cụ': (context) => dungcu(userId: ModalRoute.of(context)!.settings.arguments as String),
-  '/vật liệu': (context) => vatlieu(userId: ModalRoute.of(context)!.settings.arguments as String),
+  '/vật liệu': (context) => vatlieu(userId: ModalRoute.of(context)!.settings.arguments as String,title: ModalRoute.of(context)!.settings.arguments as String ),
       '/themmaymoc': (context) => themmaymoc(idPhieumaymoc: ModalRoute.of(context)!.settings.arguments as String),
       '/themdoanhthu': (context) => themdoanhthu(idPhieudoanhthu: ModalRoute.of(context)!.settings.arguments as String),
       '/themdungcu': (context) => themdungcu(idPhieudungcu: ModalRoute.of(context)!.settings.arguments as String),
@@ -27,7 +27,7 @@ void main() {
   
 
     '/công việc':(context) => congviec(userId: ModalRoute.of(context)!.settings.arguments as String),
-    
+    '/chọn phiếu': (context) => chonphieu(userId: ModalRoute.of(context)!.settings.arguments as String),
     },
   ));
 }
@@ -99,7 +99,7 @@ class CongViecItem extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => doanhthucongviec(userId: userId,title: title,),
+                  builder: (context) => chonphieu(userId: userId),
                 ),
               );
               break;
@@ -107,7 +107,7 @@ class CongViecItem extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => doanhthucongviec(userId: userId,title:title),
+                  builder: (context) => chonphieu(userId: userId),
                 ),
               );
               break;
@@ -115,7 +115,7 @@ class CongViecItem extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => doanhthucongviec(userId: userId,title: title,),
+                  builder: (context) => chonphieu(userId: userId),
                 ),
               );
               break;
@@ -138,6 +138,109 @@ class CongViecItem extends StatelessWidget {
     );
   }
 }
+
+
+
+class chonphieu extends StatelessWidget {
+  final String userId;
+
+  chonphieu({ required this.userId});
+
+   @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+       backgroundColor: const Color.fromRGBO(88, 203, 108, 1),
+      body: Stack(
+        children: [
+          ListView(
+            padding: EdgeInsets.all(16),
+            children: [
+              Container(
+                margin: EdgeInsets.only(top: 120),
+                child: Text(
+                  'CHỌN PHIẾU',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white, fontFamily: 'SFUFUTURABOOK'),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              ChonPhieuItem(title: 'PHIẾU DOANH THU', userId: userId),
+              ChonPhieuItem(title: 'PHIẾU VẬT LIỆU', userId: userId),
+            ],
+          ),
+          Positioned(
+            top: 20, // Khoảng cách từ phía trên
+            left: 16, // Khoảng cách từ phía trái
+            child: Container(
+             
+              child: IconButton(
+                 icon: Icon(
+                    Icons.arrow_back_ios,
+                    color: Colors.white, // Đổi màu biểu tượng ở đây
+                  ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ChonPhieuItem extends StatelessWidget {
+  final String title;
+  final String userId;
+
+  ChonPhieuItem({required this.title, required this.userId});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(top: 50, left: 20, right: 20),
+      child: GestureDetector(
+        onTap: () {
+          // Điều hướng đến trang tương ứng khi mục được chọn
+          switch (title) {
+            case 'PHIẾU DOANH THU':
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => doanhthucongviec(userId: userId,title: title),
+                ),
+              );
+              break;
+            case 'PHIẾU VẬT LIỆU':
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => vatlieu(userId: userId,title: title,),
+                ),
+              );
+              break;
+            default:
+              break;
+          }
+        },
+        child: Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Text(
+            title,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color.fromRGBO(46, 173, 67, 1),fontFamily: 'SFUFUTURABOOK',),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+
 
 
 
@@ -818,6 +921,13 @@ class _ThemDoanhThuScreenState extends State<themdoanhthu> {
       }
     } else {
       print("Vui lòng điền vào ô trống");
+      ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Vui lòng điền vào ô trống!'),
+        duration: Duration(seconds: 2), // Đặt thời gian hiển thị của snack bar
+        backgroundColor: Colors.red,
+      ),
+    );
     }
   }
 
@@ -1128,16 +1238,76 @@ Wrap(
   }).toList(),
 ),
 
-    
-       SizedBox(height: 10),
-            TextFormField(
+        SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
               controller: tensanpham,
-              decoration: InputDecoration(labelText: 'Tên sản phẩm'),
+              decoration: InputDecoration(
+                labelText: 'Tên sản phẩm',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
             ),
-            SizedBox(height: 10),
-            TextFormField(
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+               SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
               controller: soluong,
-              decoration: InputDecoration(labelText: 'Số lượng'),
+              decoration: InputDecoration(
+                labelText: 'Số lượng',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
+            ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
             ),
             SizedBox(height: 20),
             Row(
@@ -1150,10 +1320,14 @@ Wrap(
                   child: Text("Thêm"),
                 ),
                 ElevatedButton(
+           
                   onPressed: () {
                     Navigator.pop(context, false);
                   },
-                  child: Text("Hủy"),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red,
+                  ),
+                  child: Text("Hủy")
                 ),
               ],
             ),
@@ -2098,8 +2272,9 @@ class _ThemDungCuScreenState extends State<themdungcu>{
 ///////////////////////////////////////////// Start Vật liệu
 class vatlieu extends StatefulWidget {
   final String userId;
+  final String title;
 
-  vatlieu({required this.userId});
+  vatlieu({required this.userId, required this.title});
   @override
   _VatLieuScreenState createState() => _VatLieuScreenState();
 
@@ -2108,9 +2283,23 @@ class vatlieu extends StatefulWidget {
 class _VatLieuScreenState extends State<vatlieu> {
 
   TextEditingController ngaynhapphieu = TextEditingController();
-  
-
   List<String> danhSachSudungVatLieu = [];
+
+    String trichXuatThang(String ngayNhapPhieu) {
+    final parts = ngayNhapPhieu.split('/');
+    if (parts.length >= 2) {
+      return parts[1];
+    }
+    return '';
+  }
+
+  String trichXuatNam(String ngayNhapPhieu) {
+    final parts = ngayNhapPhieu.split('/');
+    if (parts.length >= 3) {
+      return parts[2];
+    }
+    return '';
+  }
 
   @override
   void initState(){
@@ -2120,7 +2309,6 @@ class _VatLieuScreenState extends State<vatlieu> {
   }
   void setNgayNhapPhieu(){
      DateTime now = DateTime.now();
-
     // Gán giá trị ngày tháng năm vào trường ngaynhapphieu
     ngaynhapphieu.text = "${now.day}/${now.month}/${now.year}";
     
@@ -2129,19 +2317,26 @@ class _VatLieuScreenState extends State<vatlieu> {
  Future<void> themphieuvatlieu() async {
     if(ngaynhapphieu.text!=""){
       try{
-
         String uri = "http://buffquat13.000webhostapp.com/themphieuvatlieu.php";
-
         var res=await http.post(Uri.parse(uri),body: {
           "ngaynhapphieu":ngaynhapphieu.text,
           "uid":widget.userId,
-         
         });
         var response = jsonDecode(res.body);
         if(response["Success"]=="true"){
-      
           print("Them phieu may moc thanh cong!");
           ngaynhapphieu.text="";
+
+          // Lấy danh sách mới nhất sau khi thêm thành công
+          await getphieuvatlieu();
+           ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Thêm thành công!'),
+              duration: Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.green,
+            ),
+          );
         }
         else{
           print("Error!");
@@ -2155,8 +2350,6 @@ class _VatLieuScreenState extends State<vatlieu> {
     else{
       print("Lam on dien vao o trong");
     }
-    getphieuvatlieu();
-    
   }
 
   Future<void> getphieuvatlieu() async {
@@ -2181,56 +2374,209 @@ class _VatLieuScreenState extends State<vatlieu> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Danh sách phiếu vật liệu'),
-      ),
-      body: ListView.builder(
-  itemCount: danhSachSudungVatLieu.length,
-  itemBuilder: (context, index) {
-     final parts = danhSachSudungVatLieu[index].split(' - ');
-    final ngayNhapPhieu = parts[0];
-    final idPhieuvatlieu = parts[1];
-    return InkWell(
-      onTap: () async {
-      
-        // Chuyển hướng tới trang chitietphieumaymoc khi nhấn vào phần tử trong RecyclerView
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder:(context) =>
-            chitietphieuvatlieu(ngayPhieu: ngayNhapPhieu,idPhieuvatlieu:idPhieuvatlieu,
-           ),
+  Future<void> xoaPhieuVatLieu(String idPhieuvatlieu) async {
+    try {
+      String uri = "http://buffquat13.000webhostapp.com/xoaphieuvatlieu.php";
+      var res = await http.post(Uri.parse(uri), body: {
+        "idPhieuvatlieu": idPhieuvatlieu,
+      });
+      var response = jsonDecode(res.body);
+      if (response["Success"] == "true") {
+        print("Xóa phiếu vật liệu thành công!");
+        await getphieuvatlieu();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Xóa thành công!'),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.red,
           ),
         );
-      },
-      child: ListTile(
-        title: Text(ngayNhapPhieu), // Hiển thị thông tin máy móc (thay bằng thông tin thực tế của bạn)
-      ),
-    );
-  },
-),
+      } else {
+        print("Lỗi khi xóa phiếu doanh thu!");
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          themphieuvatlieu();
-             ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-        content: Text('Thêm thành công!'),
-        duration: Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating, // Hiển thị phía trên
-        backgroundColor: Colors.green, // Thay đổi màu nền
+   List<String> filterPhieuTheoThang(String thang, String nam) {
+    return danhSachSudungVatLieu.where((phieu) {
+      final parts = phieu.split(' - ');
+      final ngayNhapPhieu = parts[0];
+      final thangPhieu = trichXuatThang(ngayNhapPhieu);
+      final namPhieu = trichXuatNam(ngayNhapPhieu);
+      return thangPhieu == thang && namPhieu == nam;
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 12, // Số tab tương ứng với 12 năm
+      child: Scaffold(
+      appBar: AppBar(
+        backgroundColor:Color.fromRGBO(11, 180, 34, 1),
+        title: Text(widget.title),
+         bottom: TabBar(
+            indicatorColor: Colors.white,
+            isScrollable: true,
+            tabs: List<Widget>.generate(12, (int index) {
+              final year = DateTime.now().year - index;
+              return Tab(
+                text: "Năm $year",
+              );
+            }),
+          ),
       ),
-    );
-        },
-        child: Icon(Icons.add),
+      body: TabBarView(
+          children: List<Widget>.generate(12, (int index) {
+            final year = DateTime.now().year - index;
+            return ListView.builder(
+              
+              itemCount: 12, // Số tháng trong năm
+              itemBuilder: (context, index) {
+                final month = index + 1;
+                final phiieusThangNam = filterPhieuTheoThang(month.toString(), year.toString());
+                if (phiieusThangNam.isEmpty) {
+                  return SizedBox.shrink(); // Không hiển thị nếu không có phiếu trong tháng/năm
+                }
+                return Column(
+                  
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Text(
+                        'Tháng $month',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                           fontFamily: 'SFUFUTURABOOK',
+                           color: Color.fromRGBO(226, 18, 18, 1)
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(left: 10,right: 10),
+                   child:GridView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(                    
+                        crossAxisCount: 4,
+                        crossAxisSpacing: 10.0,
+                        mainAxisSpacing: 10.0,
+                      ),
+                      itemCount: phiieusThangNam.length,
+                      itemBuilder: (context, index) {
+                        final parts = phiieusThangNam[index].split(' - ');
+                        final ngayNhapPhieu = parts[0];
+                        final idPhieuvatlieu = parts[1];
+                        return InkWell(
+                          onTap: () async {
+                            Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => chitietphieuvatlieu(
+                          ngayPhieu: ngayNhapPhieu,
+                          idPhieuvatlieu: idPhieuvatlieu,
+                        ),
+                      ),
+                    );
+                          },
+                          onLongPress: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Xóa Phiếu Doanh Thu"),
+                                  content: Text("Bạn có chắc muốn xóa phiếu này?"),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(); // Đóng dialog
+                                      },
+                                      child: Text("Hủy"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        await xoaPhieuVatLieu(idPhieuvatlieu);
+                                        Navigator.of(context).pop(); // Đóng dialog
+                                      },
+                                      child: Text("Xóa"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          
+                            child:Container(
+                            decoration: BoxDecoration(
+                              color: Color.fromRGBO(11, 180, 34, 1),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Container(
+                                  
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.receipt,
+                                      color: Colors.white,
+                                      size: 40,
+                                    ),
+                                    SizedBox(height: 2),
+                                    Text(
+                                      ngayNhapPhieu,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'SFUFUTURABOOK'
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                  
+                        );
+                      },
+                    ),
+                ),
+                  ],
+                );
+              },
+            );
+          }),
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Color.fromRGBO(11, 180, 34, 1),
+          onPressed: () async {
+            themphieuvatlieu();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Thêm thành công!'),
+                duration: Duration(seconds: 2),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.green,
+              ),
+            );
+          },
+          child: Icon(Icons.add),
+        ),
       ),
     );
   }
 }
-
 
 class VatLieuData {
   String Thoigiannhapphieu;
@@ -2264,9 +2610,6 @@ class chitietphieuvatlieu extends StatefulWidget {
 }
 
 class _chitietphieuvatlieuState extends State<chitietphieuvatlieu> {
- 
-
-
 
   List<VatLieuData> danhSachVatLieu = [];
 
@@ -2316,11 +2659,12 @@ Widget build(BuildContext context) {
         style: TextStyle(fontSize: 19),
       ),
     ),
-    body: Container(
+    body:SingleChildScrollView(
+    child: Container(
       width: double.infinity, // Đảm bảo container rộng bằng màn hình
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: Row(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center, // Căn giữa theo chiều ngang
           children: [
             Table(
@@ -2453,6 +2797,7 @@ Widget build(BuildContext context) {
         ),
       ),
     ),
+    ),
     floatingActionButton: FloatingActionButton(
       onPressed: () async {
         bool success = await Navigator.push(
@@ -2560,36 +2905,191 @@ class _ThemVatLieuScreenState extends State<themvatlieu>{
  
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-         title: Text(
-          'Thêm tiến trình vật liệu: ${widget.idPhieuvatlieu}',
-          style: TextStyle(fontSize: 19),
-        ),
-      ),
+      
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextFormField(
+                        SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
               controller: tensanpham,
-              decoration: InputDecoration(labelText: 'Tên sản phẩm'),
+              decoration: InputDecoration(
+                labelText: 'Tên sản phẩm',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
             ),
-            TextFormField(
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+                        SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
               controller: tondaungay,
-              decoration: InputDecoration(labelText: 'Tồn đầu ngày'),
+              decoration: InputDecoration(
+                labelText: 'Tồn đầu ngày',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
             ),
-             TextFormField(
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+                         SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
               controller: khachhangmaso,
-              decoration: InputDecoration(labelText: 'Khách hàng mã số'),
+              decoration: InputDecoration(
+                labelText: 'Khách hàng - Mã số',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
             ),
-            TextFormField(
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+                        SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
               controller: soluongsudung,
-              decoration: InputDecoration(labelText: 'Số lượng sử dụng'),
+              decoration: InputDecoration(
+                labelText: 'Số lượng sử dụng',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
             ),
-             TextFormField(
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+                         SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
               controller: conlaicuoingay,
-              decoration: InputDecoration(labelText: 'Còn lại cuối ngày'),
+              decoration: InputDecoration(
+                labelText: 'Còn lại cuối ngày',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
+            ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
             ),
           
             // TextFormField(
@@ -2597,11 +3097,27 @@ class _ThemVatLieuScreenState extends State<themvatlieu>{
             //   decoration: InputDecoration(labelText: 'Ngay nhap phieu'),
             //   enabled: false,
             // ),
-           ElevatedButton(
-              onPressed: () {
-                insertrecordvatlieu(widget.idPhieuvatlieu);
-              },
-              child: Text("Thêm"),
+           SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    insertrecordvatlieu(widget.idPhieuvatlieu);
+                  },
+                  child: Text("Thêm"),
+                ),
+                ElevatedButton(
+           
+                  onPressed: () {
+                    Navigator.pop(context, false);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red,
+                  ),
+                  child: Text("Hủy")
+                ),
+              ],
             ),
 
           ],
@@ -2844,7 +3360,7 @@ class HomeUser extends StatefulWidget {
 }
 
 class _HomeUserState extends State<HomeUser> {
-  final List<String> menuItems = ['Công việc', 'Máy móc', 'Dụng cụ', 'Vật liệu'];
+  final List<String> menuItems = ['Công việc'];
 
   bool isWorking = false;
   bool isEndButtonDisabled = true;
