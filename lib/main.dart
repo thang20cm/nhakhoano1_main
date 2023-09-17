@@ -1,4 +1,11 @@
 import 'dart:convert';
+
+
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -6,7 +13,12 @@ import 'package:intl/intl.dart';
 
 
 
-void main() {
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+  print(fcmToken);
 
   runApp(MaterialApp(
     initialRoute: '/',
@@ -27,7 +39,8 @@ void main() {
   
 
     '/công việc':(context) => congviec(userId: ModalRoute.of(context)!.settings.arguments as String),
-    '/chọn phiếu': (context) => chonphieu(userId: ModalRoute.of(context)!.settings.arguments as String),
+    '/chọn phiếu': (context) => chonphieu(userId: ModalRoute.of(context)!.settings.arguments as String,title: ModalRoute.of(context)!.settings.arguments as String ),
+    '/chọn phiếu lâm sàn': (context) => chonphieulamsan(userId: ModalRoute.of(context)!.settings.arguments as String,title: ModalRoute.of(context)!.settings.arguments as String ),
     },
   ));
 }
@@ -99,7 +112,7 @@ class CongViecItem extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => chonphieu(userId: userId),
+                  builder: (context) => chonphieulamsan(userId: userId,title:title),
                 ),
               );
               break;
@@ -107,7 +120,7 @@ class CongViecItem extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => chonphieu(userId: userId),
+                  builder: (context) => chonphieu(userId: userId,title:title),
                 ),
               );
               break;
@@ -115,7 +128,7 @@ class CongViecItem extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => chonphieu(userId: userId),
+                  builder: (context) => chonphieu(userId: userId,title:title),
                 ),
               );
               break;
@@ -143,24 +156,30 @@ class CongViecItem extends StatelessWidget {
 
 class chonphieu extends StatelessWidget {
   final String userId;
+  final String title;
 
-  chonphieu({ required this.userId});
+  chonphieu({ required this.userId, required this.title });
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-       backgroundColor: const Color.fromRGBO(88, 203, 108, 1),
+      backgroundColor: const Color.fromRGBO(88, 203, 108, 1),
       body: Stack(
         children: [
           ListView(
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.only(top: 150),
+            
             children: [
-              Container(
-                margin: EdgeInsets.only(top: 120),
+              Align(
+                alignment: Alignment.center,
                 child: Text(
                   'CHỌN PHIẾU',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white, fontFamily: 'SFUFUTURABOOK'),
-                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    fontFamily: 'SFUFUTURABOOK',
+                  ),
                 ),
               ),
               ChonPhieuItem(title: 'PHIẾU DOANH THU', userId: userId),
@@ -171,15 +190,32 @@ class chonphieu extends StatelessWidget {
             top: 20, // Khoảng cách từ phía trên
             left: 16, // Khoảng cách từ phía trái
             child: Container(
-             
               child: IconButton(
-                 icon: Icon(
-                    Icons.arrow_back_ios,
-                    color: Colors.white, // Đổi màu biểu tượng ở đây
-                  ),
+                icon: Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.white, // Đổi màu biểu tượng ở đây
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                 },
+              ),
+            ),
+          ),
+          // Hiển thị giá trị của biến title chính giữa theo chiều dọc và bên trên chữ "CHỌN PHIẾU"
+          Positioned(
+            top: 90, // Điều chỉnh vị trí hiển thị title theo chiều dọc
+            left: 0,
+            right: 0,
+            child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                title, // Hiển thị giá trị của biến title
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                  fontFamily: 'SFUFUTURABOOK',
+                ),
               ),
             ),
           ),
@@ -188,6 +224,10 @@ class chonphieu extends StatelessWidget {
     );
   }
 }
+
+
+
+
 
 class ChonPhieuItem extends StatelessWidget {
   final String title;
@@ -239,6 +279,2139 @@ class ChonPhieuItem extends StatelessWidget {
   }
 }
 
+
+
+class chonphieulamsan extends StatelessWidget {
+  final String userId;
+  final String title;
+
+  chonphieulamsan({ required this.userId, required this.title });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color.fromRGBO(88, 203, 108, 1),
+      body: Stack(
+        children: [
+          ListView(
+            padding: EdgeInsets.only(top: 150),
+            
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: Text(
+                  'CHỌN PHIẾU',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    fontFamily: 'SFUFUTURABOOK',
+                  ),
+                ),
+              ),
+              ChonPhieuItem(title: 'PHIẾU DOANH THU', userId: userId),
+              ChonPhieuItem(title: 'PHIẾU VẬT LIỆU', userId: userId),
+            ],
+          ),
+          Positioned(
+            top: 20, // Khoảng cách từ phía trên
+            left: 16, // Khoảng cách từ phía trái
+            child: Container(
+              child: IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.white, // Đổi màu biểu tượng ở đây
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ),
+          // Hiển thị giá trị của biến title chính giữa theo chiều dọc và bên trên chữ "CHỌN PHIẾU"
+          Positioned(
+            top: 90, // Điều chỉnh vị trí hiển thị title theo chiều dọc
+            left: 0,
+            right: 0,
+            child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                title, // Hiển thị giá trị của biến title
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                  fontFamily: 'SFUFUTURABOOK',
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ChonPhieuItemLamSan extends StatelessWidget {
+  final String title;
+  final String userId;
+
+  ChonPhieuItemLamSan({required this.title, required this.userId});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(top: 50, left: 20, right: 20),
+      child: GestureDetector(
+        onTap: () {
+          // Điều hướng đến trang tương ứng khi mục được chọn
+          switch (title) {
+            case 'PHIẾU DOANH THU':
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => doanhthucongvieclamsan(userId: userId,title: title),
+                ),
+              );
+              break;
+            case 'PHIẾU VẬT LIỆU':
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => vatlieulamsan(userId: userId,title: title,),
+                ),
+              );
+              break;
+            default:
+              break;
+          }
+        },
+        child: Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Text(
+            title,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color.fromRGBO(46, 173, 67, 1),fontFamily: 'SFUFUTURABOOK',),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class vatlieulamsan extends StatefulWidget {
+  final String userId;
+  final String title;
+
+  vatlieulamsan({required this.userId, required this.title});
+  @override
+  _VatLieuLamSanScreenState createState() => _VatLieuLamSanScreenState();
+
+}
+
+class _VatLieuLamSanScreenState extends State<vatlieulamsan> {
+
+  TextEditingController ngaynhapphieu = TextEditingController();
+  List<String> danhSachSudungVatLieu = [];
+
+    String trichXuatThang(String ngayNhapPhieu) {
+    final parts = ngayNhapPhieu.split('/');
+    if (parts.length >= 2) {
+      return parts[1];
+    }
+    return '';
+  }
+
+  String trichXuatNam(String ngayNhapPhieu) {
+    final parts = ngayNhapPhieu.split('/');
+    if (parts.length >= 3) {
+      return parts[2];
+    }
+    return '';
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    setNgayNhapPhieu();
+    getphieuvatlieu();
+  }
+  void setNgayNhapPhieu(){
+     DateTime now = DateTime.now();
+    // Gán giá trị ngày tháng năm vào trường ngaynhapphieu
+    ngaynhapphieu.text = "${now.day}/${now.month}/${now.year}";
+    
+  }
+
+ Future<void> themphieuvatlieu() async {
+    if(ngaynhapphieu.text!=""){
+      try{
+        String uri = "http://buffquat13.000webhostapp.com/themphieuvatlieu_lamsan.php";
+        var res=await http.post(Uri.parse(uri),body: {
+          "ngaynhapphieu":ngaynhapphieu.text,
+          "uid":widget.userId,
+        });
+        var response = jsonDecode(res.body);
+        if(response["Success"]=="true"){
+          print("Them phieu may moc thanh cong!");
+          ngaynhapphieu.text="";
+
+          // Lấy danh sách mới nhất sau khi thêm thành công
+          await getphieuvatlieu();
+           ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Thêm thành công!'),
+              duration: Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+        else{
+          print("Error!");
+        }
+      }
+      catch(e){
+        print(e);
+      }
+
+    }
+    else{
+      print("Lam on dien vao o trong");
+    }
+  }
+
+  Future<void> getphieuvatlieu() async {
+    try {
+      String uri = "http://buffquat13.000webhostapp.com/get_phieuvatlieu_lamsan.php";
+      var response = await http.get(Uri.parse(uri));
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+         List<String> danhSachVatLieu = data
+          .where((item) => item['uid'] == widget.userId) // Lọc theo uid
+          .map((item) => "${item['Ngaynhapphieu']} - ${item['idPhieuvatlieu']}")
+          .toList();
+        setState(() {
+          this.danhSachSudungVatLieu = danhSachVatLieu;
+        });
+      } else {
+        print("Lỗi khi lấy dữ liệu từ bảng phieumaymoc: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Lỗi khi lấy dữ liệu từ bảng phieumaymoc: $e");
+    }
+  }
+
+  Future<void> xoaPhieuVatLieu(String idPhieuvatlieu) async {
+    try {
+      String uri = "http://buffquat13.000webhostapp.com/xoaphieuvatlieu_lamsan.php";
+      var res = await http.post(Uri.parse(uri), body: {
+        "idPhieuvatlieu": idPhieuvatlieu,
+      });
+      var response = jsonDecode(res.body);
+      if (response["Success"] == "true") {
+        print("Xóa phiếu vật liệu thành công!");
+        await getphieuvatlieu();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Xóa thành công!'),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else {
+        print("Lỗi khi xóa phiếu doanh thu!");
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+   List<String> filterPhieuTheoThang(String thang, String nam) {
+    return danhSachSudungVatLieu.where((phieu) {
+      final parts = phieu.split(' - ');
+      final ngayNhapPhieu = parts[0];
+      final thangPhieu = trichXuatThang(ngayNhapPhieu);
+      final namPhieu = trichXuatNam(ngayNhapPhieu);
+      return thangPhieu == thang && namPhieu == nam;
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 12, // Số tab tương ứng với 12 năm
+      child: Scaffold(
+      appBar: AppBar(
+        backgroundColor:Color.fromRGBO(11, 180, 34, 1),
+        title: Text(widget.title),
+         bottom: TabBar(
+            indicatorColor: Colors.white,
+            isScrollable: true,
+            tabs: List<Widget>.generate(12, (int index) {
+              final year = DateTime.now().year - index;
+              return Tab(
+                text: "Năm $year",
+              );
+            }),
+          ),
+      ),
+      body: TabBarView(
+          children: List<Widget>.generate(12, (int index) {
+            final year = DateTime.now().year - index;
+            return ListView.builder(
+              
+              itemCount: 12, // Số tháng trong năm
+              itemBuilder: (context, index) {
+                final month = index + 1;
+                final phiieusThangNam = filterPhieuTheoThang(month.toString(), year.toString());
+                if (phiieusThangNam.isEmpty) {
+                  return SizedBox.shrink(); // Không hiển thị nếu không có phiếu trong tháng/năm
+                }
+                return Column(
+                  
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Text(
+                        'Tháng $month',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                           fontFamily: 'SFUFUTURABOOK',
+                           color: Color.fromRGBO(226, 18, 18, 1)
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(left: 10,right: 10),
+                   child:GridView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(                    
+                        crossAxisCount: 4,
+                        crossAxisSpacing: 10.0,
+                        mainAxisSpacing: 10.0,
+                      ),
+                      itemCount: phiieusThangNam.length,
+                      itemBuilder: (context, index) {
+                        final parts = phiieusThangNam[index].split(' - ');
+                        final ngayNhapPhieu = parts[0];
+                        final idPhieuvatlieu = parts[1];
+                        return InkWell(
+                          onTap: () async {
+                            Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => chitietphieuvatlieulamsan(
+                          ngayPhieu: ngayNhapPhieu,
+                          idPhieuvatlieu: idPhieuvatlieu,
+                        ),
+                      ),
+                    );
+                          },
+                          onLongPress: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Xóa Phiếu Doanh Thu"),
+                                  content: Text("Bạn có chắc muốn xóa phiếu này?"),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(); // Đóng dialog
+                                      },
+                                      child: Text("Hủy"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        await xoaPhieuVatLieu(idPhieuvatlieu);
+                                        Navigator.of(context).pop(); // Đóng dialog
+                                      },
+                                      child: Text("Xóa"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          
+                            child:Container(
+                            decoration: BoxDecoration(
+                              color: Color.fromRGBO(11, 180, 34, 1),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Container(
+                                  
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.receipt,
+                                      color: Colors.white,
+                                      size: 40,
+                                    ),
+                                    SizedBox(height: 2),
+                                    Text(
+                                      ngayNhapPhieu,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'SFUFUTURABOOK'
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                  
+                        );
+                      },
+                    ),
+                ),
+                  ],
+                );
+              },
+            );
+          }),
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Color.fromRGBO(11, 180, 34, 1),
+          onPressed: () async {
+            themphieuvatlieu();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Thêm thành công!'),
+                duration: Duration(seconds: 2),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.green,
+              ),
+            );
+          },
+          child: Icon(Icons.add),
+        ),
+      ),
+    );
+  }
+}
+
+class VatLieuLamSanData {
+  String Thoigiannhapphieu;
+  String Tensanpham;
+  String Tondaungay;
+  String Khachhangmaso;
+  String Soluongsudung;
+ String Conlaicuoingay;
+ String idChitietphieuvatlieu;
+ String idphieuvatlieuu;
+
+  VatLieuLamSanData({
+    required this.Thoigiannhapphieu,
+    required this.Tensanpham,
+    required this.Tondaungay,
+    required this.Khachhangmaso,
+    required this.Soluongsudung,
+    required this.Conlaicuoingay,
+    required this.idChitietphieuvatlieu,
+    required this.idphieuvatlieuu,
+  });
+}
+
+class chitietphieuvatlieulamsan extends StatefulWidget {
+  final String ngayPhieu;
+  final String idPhieuvatlieu;
+
+
+  chitietphieuvatlieulamsan({required this.ngayPhieu,required this.idPhieuvatlieu});
+
+  @override
+  _chitietphieuvatlieulamsanState createState() => _chitietphieuvatlieulamsanState();
+}
+
+class _chitietphieuvatlieulamsanState extends State<chitietphieuvatlieulamsan> {
+
+  List<VatLieuLamSanData> danhSachVatLieu = [];
+
+  @override
+  void initState(){
+    super.initState();
+    fetchDataSudungVatLieu();
+  }
+
+  Future<void> fetchDataSudungVatLieu() async {
+    try {
+      String uri = "http://buffquat13.000webhostapp.com/get_vatlieu_lamsan.php";
+      var response = await http.get(Uri.parse(uri));
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        List<VatLieuLamSanData> vatLieuList = data.map((item) => VatLieuLamSanData(
+              idChitietphieuvatlieu: item['idVatlieu'],
+              idphieuvatlieuu: item['idPhieuvatlieu'],
+              Thoigiannhapphieu: item['Thoigiannhapphieu'],
+              Tensanpham: item['Tensp'],
+              Tondaungay: item['Tondaungay'],
+              Khachhangmaso: item['KhachangMaso'],
+              Soluongsudung: item['Soluongsudung'],
+              Conlaicuoingay: item['Conlaicuoingay'], 
+            )).toList();
+
+        setState(() {
+          danhSachVatLieu = vatLieuList.where((vatlieu) => vatlieu.idphieuvatlieuu == widget.idPhieuvatlieu).toList();
+        });
+      } else {
+        print("Lỗi khi lấy dữ liệu từ bảng sudungvatlieu: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Lỗi khi lấy dữ liệu từ bảng sudungvatlieu: $e");
+    }
+  }
+
+@override
+Widget build(BuildContext context) {
+  double screenWidth = MediaQuery.of(context).size.width;
+  double columnWidthPercentage = screenWidth * 0.1428; // Ví dụ: mỗi cột chiếm 25% màn hình
+
+  return Scaffold(
+    appBar: AppBar(
+      title: Text(
+        'Phiếu vật liệu: ${widget.ngayPhieu}',
+        style: TextStyle(fontSize: 19),
+      ),
+    ),
+    body:SingleChildScrollView(
+    child: Container(
+      width: double.infinity, // Đảm bảo container rộng bằng màn hình
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center, // Căn giữa theo chiều ngang
+          children: [
+            Table(
+              border: TableBorder.all(), // Đường viền cho bảng
+              columnWidths: {
+                0: FixedColumnWidth(columnWidthPercentage), // Độ rộng cột 0
+                1: FixedColumnWidth(columnWidthPercentage), // Độ rộng cột 1
+                2: FixedColumnWidth(columnWidthPercentage), // Độ rộng cột 2
+                3: FixedColumnWidth(columnWidthPercentage),
+                4: FixedColumnWidth(columnWidthPercentage), 
+                5: FixedColumnWidth(columnWidthPercentage), // Độ rộng cột 3
+                6: FixedColumnWidth(columnWidthPercentage), 
+              },
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
+              children: [
+                TableRow(
+                  children: [
+                    TableCell(
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        // Màu nền
+                        child: Text(
+                          'Thời gian',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    TableCell(
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                       // Màu nền
+                        child: Text(
+                          'Tên sản phẩm',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    TableCell(
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                       // Màu nền
+                        child: Text(
+                          'Tồn đầu ngày',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                     TableCell(
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                     // Màu nền
+                        child: Text(
+                          'Khách hàng - Mã số',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                     TableCell(
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        // Màu nền
+                        child: Text(
+                          'Số lượng sử dụng',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                       TableCell(
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        // Màu nền
+                        child: Text(
+                          'Còn lại cuối ngày',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                      TableCell(
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        // Màu nền
+                        child: Text(
+                          'Chỉnh sửa',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                // Thêm các hàng dữ liệu tương tự như dưới đây
+                for (var item in danhSachVatLieu)
+                  TableRow(
+                    children: [
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding tùy chỉnh
+                          child: Text(item.Thoigiannhapphieu),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding tùy chỉnh
+                          child: Text(item.Tensanpham),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding tùy chỉnh
+                          child: Text(item.Tondaungay),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding tùy chỉnh
+                          child: Text(item.Khachhangmaso),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding tùy chỉnh
+                          child: Text(item.Soluongsudung),
+                        ),
+                      ),
+                        TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding tùy chỉnh
+                          child: Text(item.Conlaicuoingay),
+                        ),
+                      ),
+                       TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: IconButton(
+                                icon: Icon(Icons.edit), // Sử dụng biểu tượng chỉnh sửa
+                                onPressed: () {
+                                  _showEditDialog(context, item);
+                                },
+                              ),
+                            ),
+                          ),
+                    ],
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+    ),
+    floatingActionButton: FloatingActionButton(
+      onPressed: () async {
+        bool success = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => themvatlieu(
+              idPhieuvatlieu: widget.idPhieuvatlieu,
+            ),
+          ),
+        );
+        if (success == true) {
+          fetchDataSudungVatLieu();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Thêm thành công!'),
+              duration: Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating, // Hiển thị phía trên
+              backgroundColor: Colors.green, // Thay đổi màu nền
+            ),
+          );
+        }
+      },
+      child: Icon(Icons.add),
+    ),
+  );
+  
+}
+Future<void> _showEditDialog(BuildContext context, VatLieuLamSanData vatlieu) async {
+  TextEditingController _thoiGianController = TextEditingController(text: vatlieu.Thoigiannhapphieu);
+  TextEditingController _tenSPController = TextEditingController(text: vatlieu.Tensanpham);
+  TextEditingController _tonDauNgayController = TextEditingController(text: vatlieu.Tondaungay);
+  TextEditingController _KHMSController = TextEditingController(text: vatlieu.Khachhangmaso);
+  TextEditingController _soLuongSDController = TextEditingController(text: vatlieu.Soluongsudung);
+  TextEditingController _conLaiController = TextEditingController(text: vatlieu.Conlaicuoingay);
+
+
+  await showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Chỉnh sửa phiếu doanh thu'),
+        content: SingleChildScrollView( // Bao bọc nội dung trong SingleChildScrollView
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _thoiGianController,
+                decoration: InputDecoration(labelText: 'Thời gian nhập phiếu'),
+                enabled: false,
+              ),
+              TextFormField(
+                controller: _tenSPController,
+                decoration: InputDecoration(labelText: 'Tên sản phẩm'),
+              ),
+              TextFormField(
+                controller: _tonDauNgayController,
+                decoration: InputDecoration(labelText: 'Tồn đầu ngày'),
+              ),
+              TextFormField(
+                controller: _KHMSController,
+                decoration: InputDecoration(labelText: 'Khách hàng - Mã số'),
+              ),
+               TextFormField(
+                controller: _soLuongSDController,
+                decoration: InputDecoration(labelText: 'Số lượng sử dụng'),
+              ),
+              TextFormField(
+                controller: _conLaiController,
+                decoration: InputDecoration(labelText: 'Còn lại cuối ngày'),
+              ),
+              
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              // Lấy giá trị mới từ các trường nhập liệu
+              String thoiGianMoi = _thoiGianController.text;
+              String tenSPMoi = _tenSPController.text;
+              String tonDauNgayMoi = _tonDauNgayController.text;
+              String KHMSMoi = _KHMSController.text;
+              String soLuongSDMoi = _soLuongSDController.text;
+              String conlaiMoi = _conLaiController.text;
+            
+
+              // Tạo dữ liệu JSON để gửi lên API
+              Map<String, String> data = {
+                'idChitietphieuvatlieu': vatlieu.idChitietphieuvatlieu,
+                'thoiGian': thoiGianMoi,
+                'tenSP': tenSPMoi,
+                'tondaungay': tonDauNgayMoi,
+                'KHMS': KHMSMoi,
+                'soLuong': soLuongSDMoi,
+                'conlai': conlaiMoi,
+              };
+
+              // Gửi yêu cầu POST đến API
+              String apiUrl = "http://buffquat13.000webhostapp.com/edit_vatlieu_lamsan.php";
+              var response = await http.post(Uri.parse(apiUrl), body: data);
+
+              if (response.statusCode == 200) {
+                // Xử lý phản hồi từ API nếu cần
+                print("Cập nhật thành công");
+                // Đóng hộp thoại chỉnh sửa
+                Navigator.of(context).pop();
+                // Cập nhật lại danh sách chi tiết phiếu doanh thu
+                fetchDataSudungVatLieu();
+              } else {
+                print("Lỗi khi cập nhật dữ liệu: ${response.statusCode}");
+              }
+            },
+            child: Text('Lưu'),
+          ),
+        ],
+      );
+    },
+  );
+}
+}
+
+
+
+
+
+class doanhthucongvieclamsan extends StatefulWidget {
+  final String userId;
+  final String title;
+
+  doanhthucongvieclamsan({required this.userId, required this.title});
+
+  @override
+  _DoanhThuCongViecLamSanState createState() => _DoanhThuCongViecLamSanState();
+}
+
+class _DoanhThuCongViecLamSanState extends State<doanhthucongvieclamsan> {
+  TextEditingController ngayNhapPhieu = TextEditingController();
+  List<String> danhSachSuDungDoanhThu = [];
+
+  String trichXuatThang(String ngayNhapPhieu) {
+    final parts = ngayNhapPhieu.split('/');
+    if (parts.length >= 2) {
+      return parts[1];
+    }
+    return '';
+  }
+
+  String trichXuatNam(String ngayNhapPhieu) {
+    final parts = ngayNhapPhieu.split('/');
+    if (parts.length >= 3) {
+      return parts[2];
+    }
+    return '';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    setNgayNhapPhieu();
+    getPhieuDoanhThu();
+  }
+
+  void setNgayNhapPhieu() {
+    DateTime now = DateTime.now();
+    ngayNhapPhieu.text = "${now.day}/${now.month}/${now.year}";
+  }
+
+  Future<void> themPhieuDoanhThu() async {
+    if (ngayNhapPhieu.text != "") {
+      try {
+        String uri = "http://buffquat13.000webhostapp.com/themphieudoanhthulamsan.php";
+        var res = await http.post(Uri.parse(uri), body: {
+          "ngaynhapphieu": ngayNhapPhieu.text,
+          "uid": widget.userId,
+        });
+        var response = jsonDecode(res.body);
+        if (response["Success"] == "true") {
+          print("Thêm phiếu doanh thu thành công!");
+          ngayNhapPhieu.text = "";
+
+          // Lấy danh sách mới nhất sau khi thêm thành công
+          await getPhieuDoanhThu();
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Thêm thành công!'),
+              duration: Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          print("Lỗi khi thêm phiếu doanh thu!");
+        }
+      } catch (e) {
+        print(e);
+      }
+    } else {
+      print("Vui lòng điền vào ô trống");
+    }
+  }
+
+  Future<void> getPhieuDoanhThu() async {
+    try {
+      String uri = "http://buffquat13.000webhostapp.com/get_phieudoanhthulamsan.php";
+      var response = await http.get(Uri.parse(uri));
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        List<String> danhSachDoanhThu = data
+            .where((item) => item['uid'] == widget.userId)
+            .map((item) => "${item['ngayNhapPhieu']} - ${item['idPhieudoanhthu']}")
+            .toList();
+        setState(() {
+          this.danhSachSuDungDoanhThu = danhSachDoanhThu;
+        });
+      } else {
+        print("Lỗi khi lấy dữ liệu từ bảng phieudoanhthu: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Lỗi khi lấy dữ liệu từ bảng phieudoanhthu: $e");
+    }
+  }
+
+  Future<void> xoaPhieuDoanhThu(String idPhieudoanhthu) async {
+    try {
+      String uri = "http://buffquat13.000webhostapp.com/xoaphieudoanhthulamsan.php";
+      var res = await http.post(Uri.parse(uri), body: {
+        "idPhieudoanhthu": idPhieudoanhthu,
+      });
+      var response = jsonDecode(res.body);
+      if (response["Success"] == "true") {
+        print("Xóa phiếu doanh thu thành công!");
+        await getPhieuDoanhThu();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Xóa thành công!'),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else {
+        print("Lỗi khi xóa phiếu doanh thu!");
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  List<String> filterPhieuTheoThang(String thang, String nam) {
+    return danhSachSuDungDoanhThu.where((phieu) {
+      final parts = phieu.split(' - ');
+      final ngayNhapPhieu = parts[0];
+      final thangPhieu = trichXuatThang(ngayNhapPhieu);
+      final namPhieu = trichXuatNam(ngayNhapPhieu);
+      return thangPhieu == thang && namPhieu == nam;
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 12, // Số tab tương ứng với 12 năm
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor:Color.fromRGBO(11, 180, 34, 1),
+          title: Text(widget.title),
+          bottom: TabBar(
+            indicatorColor: Colors.white,
+            isScrollable: true,
+            tabs: List<Widget>.generate(12, (int index) {
+              final year = DateTime.now().year - index;
+              return Tab(
+                text: "Năm $year",
+              );
+            }),
+          ),
+        ),
+        body: TabBarView(
+          children: List<Widget>.generate(12, (int index) {
+            final year = DateTime.now().year - index;
+            return ListView.builder(
+              
+              itemCount: 12, // Số tháng trong năm
+              itemBuilder: (context, index) {
+                final month = index + 1;
+                final phiieusThangNam = filterPhieuTheoThang(month.toString(), year.toString());
+                if (phiieusThangNam.isEmpty) {
+                  return SizedBox.shrink(); // Không hiển thị nếu không có phiếu trong tháng/năm
+                }
+                return Column(
+                  
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Text(
+                        'Tháng $month',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                           fontFamily: 'SFUFUTURABOOK',
+                           color: Color.fromRGBO(226, 18, 18, 1)
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(left: 10,right: 10),
+                   child:GridView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(                    
+                        crossAxisCount: 4,
+                        crossAxisSpacing: 10.0,
+                        mainAxisSpacing: 10.0,
+                      ),
+                      itemCount: phiieusThangNam.length,
+                      itemBuilder: (context, index) {
+                        final parts = phiieusThangNam[index].split(' - ');
+                        final ngayNhapPhieu = parts[0];
+                        final idPhieudoanhthu = parts[1];
+                        return InkWell(
+                          onTap: () async {
+                            Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => chitietphieudoanhthulamsan(
+                          ngayPhieu: ngayNhapPhieu,
+                          idPhieudoanhthu: idPhieudoanhthu,
+                        ),
+                      ),
+                    );
+                          },
+                          onLongPress: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Xóa Phiếu Doanh Thu"),
+                                  content: Text("Bạn có chắc muốn xóa phiếu này?"),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(); // Đóng dialog
+                                      },
+                                      child: Text("Hủy"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        await xoaPhieuDoanhThu(idPhieudoanhthu);
+                                        Navigator.of(context).pop(); // Đóng dialog
+                                      },
+                                      child: Text("Xóa"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          
+                            child:Container(
+                            decoration: BoxDecoration(
+                              color: Color.fromRGBO(11, 180, 34, 1),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Container(
+                                  
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.receipt,
+                                      color: Colors.white,
+                                      size: 40,
+                                    ),
+                                    SizedBox(height: 2),
+                                    Text(
+                                      ngayNhapPhieu,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'SFUFUTURABOOK'
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                  
+                        );
+                      },
+                    ),
+                ),
+                  ],
+                );
+              },
+            );
+          }),
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Color.fromRGBO(11, 180, 34, 1),
+          onPressed: () async {
+            themPhieuDoanhThu();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Thêm thành công!'),
+                duration: Duration(seconds: 2),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.green,
+              ),
+            );
+          },
+          child: Icon(Icons.add),
+        ),
+      ),
+    );
+  }
+}
+
+
+class DoanhThuDataLamSan {
+  String Thoigiannhanviec;
+  String Khachhangmaso;
+  String Noidung;
+  String Namesanpham;
+  String Soluong;
+  String Giao;
+  String Ve;
+  String idChitietphieudoanhthu;
+  String idphieudoanhthuu;
+
+  DoanhThuDataLamSan({
+    required this.Thoigiannhanviec,
+    required this.Khachhangmaso,
+    required this.Noidung,
+    required this.Namesanpham,
+    required this.Soluong,
+    required this.Giao,
+    required this.Ve,
+    required this.idChitietphieudoanhthu,
+    required this.idphieudoanhthuu,
+  });
+}
+
+class chitietphieudoanhthulamsan extends StatefulWidget {
+  final String ngayPhieu;
+  final String idPhieudoanhthu;
+
+  chitietphieudoanhthulamsan({required this.ngayPhieu, required this.idPhieudoanhthu});
+
+  @override
+  _chitietphieudoanhthulamsanState createState() => _chitietphieudoanhthulamsanState();
+}
+
+class _chitietphieudoanhthulamsanState extends State<chitietphieudoanhthulamsan> {
+  List<DoanhThuDataLamSan> danhSachDoanhThuLamSan = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDataSudungDoanhThu();
+  }
+
+  Future<void> fetchDataSudungDoanhThu() async {
+    try {
+      String uri = "http://buffquat13.000webhostapp.com/get_doanhthulamsan.php";
+      var response = await http.get(Uri.parse(uri));
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        List<DoanhThuDataLamSan> doanhThuLamSanList = data.map((item) => DoanhThuDataLamSan(
+              idChitietphieudoanhthu: item['idChitietphieudoanhthu'],
+              idphieudoanhthuu: item['idPhieudoanhthu'],
+              Thoigiannhanviec: item['Thoigiannhanviec'],
+              Khachhangmaso: item['KhachangMaso'],
+              Noidung: item['Noidung'],
+              Namesanpham: item['Tensanpham'],
+              Soluong: item['Soluong'],
+              Giao: item['Giao'],
+              Ve: item['Ve'],
+            )).toList();
+
+        setState(() {
+          danhSachDoanhThuLamSan = doanhThuLamSanList.where((doanhThu) => doanhThu.idphieudoanhthuu == widget.idPhieudoanhthu).toList();
+        });
+      } else {
+        print("Lỗi khi lấy dữ liệu từ bảng sudungmaymoc: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Lỗi khi lấy dữ liệu từ bảng sudungmaymoc: $e");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double columnWidthPercentage = screenWidth * 0.125;
+    int totalQuantity = 0;
+    int totalMoney = 0;
+
+    for (var item in danhSachDoanhThuLamSan) {
+      totalQuantity += int.parse(item.Soluong);
+      totalMoney = totalQuantity * 3000;
+    }
+    String formattedTotalMoney = NumberFormat.currency(locale: 'vi_VN', symbol: '').format(totalMoney);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Phiếu doanh thu: ${widget.ngayPhieu}',
+          style: TextStyle(fontSize: 19),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          width: double.infinity,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Column(
+              children: [
+                Table(
+                  border: TableBorder.all(),
+                  columnWidths: {
+                    0: FixedColumnWidth(columnWidthPercentage),
+                    1: FixedColumnWidth(columnWidthPercentage),
+                    2: FixedColumnWidth(columnWidthPercentage),
+                    3: FixedColumnWidth(columnWidthPercentage),
+                    4: FixedColumnWidth(columnWidthPercentage),
+                    5: FixedColumnWidth(columnWidthPercentage),
+                    6: FixedColumnWidth(columnWidthPercentage),
+                    7: FixedColumnWidth(columnWidthPercentage),
+                  },
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  children: [
+                    TableRow(
+                      children: [
+                        TableCell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Thời gian nhận việc',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Khách hàng - Mã số',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Nội dung',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Tên sản phẩm',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Số lượng',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Giao',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Về',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Thao tác',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    for (var item in danhSachDoanhThuLamSan)
+                      TableRow(
+                        children: [
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: Text(item.Thoigiannhanviec),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: Text(item.Khachhangmaso),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: Text(item.Noidung),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: Text(item.Namesanpham),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: Text(item.Soluong),
+                            ),
+                          ),
+                             TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: Text(item.Giao),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: Text(item.Ve),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: IconButton(
+                                icon: Icon(Icons.edit), // Sử dụng biểu tượng chỉnh sửa
+                                onPressed: () {
+                                  _showEditDialog(context, item);
+                                },
+                              ),
+                            ),
+                          ),
+
+                        ],
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          bool success = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => themdoanhthulamsan(
+                idPhieudoanhthu: widget.idPhieudoanhthu,
+              ),
+            ),
+          );
+          if (success == true) {
+            fetchDataSudungDoanhThu();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Thêm thành công!'),
+                duration: Duration(seconds: 2),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+        },
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+
+Future<void> _showEditDialog(BuildContext context, DoanhThuDataLamSan doanhThu) async {
+  TextEditingController _thoiGianController = TextEditingController(text: doanhThu.Thoigiannhanviec);
+  TextEditingController _khachHangController = TextEditingController(text: doanhThu.Khachhangmaso);
+  TextEditingController _noiDungController = TextEditingController(text: doanhThu.Noidung);
+  TextEditingController _tenSanPhamController = TextEditingController(text: doanhThu.Namesanpham);
+  TextEditingController _soLuongController = TextEditingController(text: doanhThu.Soluong);
+  TextEditingController _giaoController = TextEditingController(text: doanhThu.Giao);
+  TextEditingController _veController = TextEditingController(text: doanhThu.Ve);
+
+  await showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Chỉnh sửa phiếu doanh thu'),
+        content: SingleChildScrollView( // Bao bọc nội dung trong SingleChildScrollView
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _thoiGianController,
+                decoration: InputDecoration(labelText: 'Thời gian nhận việc'),
+                enabled: false,
+              ),
+              TextFormField(
+                controller: _khachHangController,
+                decoration: InputDecoration(labelText: 'Khách hàng - Mã số'),
+              ),
+              TextFormField(
+                controller: _noiDungController,
+                decoration: InputDecoration(labelText: 'Nội dung'),
+              ),
+              TextFormField(
+                controller: _tenSanPhamController,
+                decoration: InputDecoration(labelText: 'Tên sản phẩm'),
+              ),
+              TextFormField(
+                controller: _soLuongController,
+                decoration: InputDecoration(labelText: 'Số lượng'),
+              ),
+               TextFormField(
+                controller: _giaoController,
+                decoration: InputDecoration(labelText: 'Giao'),
+              ),
+              TextFormField(
+                controller: _veController,
+                decoration: InputDecoration(labelText: 'Về'),
+              ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              // Lấy giá trị mới từ các trường nhập liệu
+              String thoiGianMoi = _thoiGianController.text;
+              String khachHangMoi = _khachHangController.text;
+              String noiDungMoi = _noiDungController.text;
+              String tenSanPhamMoi = _tenSanPhamController.text;
+              String soLuongMoi = _soLuongController.text;
+              String giao = _giaoController.text;
+              String ve = _veController.text;
+
+              // Tạo dữ liệu JSON để gửi lên API
+              Map<String, String> data = {
+                'idChitietphieudoanhthu': doanhThu.idChitietphieudoanhthu,
+                'thoiGian': thoiGianMoi,
+                'khachHang': khachHangMoi,
+                'noiDung': noiDungMoi,
+                'tenSanPham': tenSanPhamMoi,
+                'soLuong': soLuongMoi,
+                'giao': giao,
+                've': ve,
+              };
+
+              // Gửi yêu cầu POST đến API
+              String apiUrl = "http://buffquat13.000webhostapp.com/edit_doanhthu_lamsan.php";
+              var response = await http.post(Uri.parse(apiUrl), body: data);
+
+              if (response.statusCode == 200) {
+                // Xử lý phản hồi từ API nếu cần
+                print("Cập nhật thành công");
+                // Đóng hộp thoại chỉnh sửa
+                Navigator.of(context).pop();
+                // Cập nhật lại danh sách chi tiết phiếu doanh thu
+                fetchDataSudungDoanhThu();
+              } else {
+                print("Lỗi khi cập nhật dữ liệu: ${response.statusCode}");
+              }
+            },
+            child: Text('Lưu'),
+          ),
+        ],
+      );
+    },
+  );
+}
+}
+
+
+
+class themdoanhthulamsan extends StatefulWidget {
+  final String idPhieudoanhthu;
+  themdoanhthulamsan({required this.idPhieudoanhthu});
+
+  @override
+  _ThemDoanhThuLamSanScreenState createState() => _ThemDoanhThuLamSanScreenState();
+}
+
+class _ThemDoanhThuLamSanScreenState extends State<themdoanhthulamsan> {
+  TextEditingController khachHangController = TextEditingController();
+  TextEditingController maSoController = TextEditingController();
+  TextEditingController noidung = TextEditingController();
+  TextEditingController tensanpham = TextEditingController();
+  TextEditingController soluong = TextEditingController();
+  TextEditingController thoigiannhanviec = TextEditingController();
+  TextEditingController giao = TextEditingController();
+  TextEditingController ve = TextEditingController();
+
+  List<dynamic> congDoanLamSanList = [];
+  Future<void> fetchData() async {
+    final response = await http.get(Uri.parse('https://buffquat13.000webhostapp.com/congdoanlamsan.php'));
+
+    if (response.statusCode == 200) {
+      setState(() {
+        congDoanLamSanList = json.decode(response.body);
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+  
+
+  bool _isRed = false;
+  double _scale = 1.0;
+
+  void _onTapDown(TapDownDetails details) {
+    setState(() {
+      _scale = 0.95;
+    });
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    setState(() {
+      _scale = 1.0;
+      _isRed = !_isRed;
+    });
+  }
+
+  void _onTapCancel() {
+    setState(() {
+      _scale = 1.0;
+    });
+  }
+
+     bool _isRed1 = false;
+  double _scale1 = 1.0;
+
+  void _onTapDown1(TapDownDetails details) {
+    setState(() {
+      _scale1 = 0.95;
+    });
+  }
+
+  void _onTapUp1(TapUpDetails details) {
+    setState(() {
+      _scale1 = 1.0;
+      _isRed1 = !_isRed1;
+    });
+  }
+
+  void _onTapCancel1() {
+    setState(() {
+      _scale1 = 1.0;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+    setNgayNhapPhieu();
+
+  }
+
+  void setNgayNhapPhieu() {
+    DateTime now = DateTime.now();
+    thoigiannhanviec.text = "${now.hour}:${now.minute}";
+  }
+
+  Future<void> insertRecordDoanhThu(String idPhieudoanhthu) async {
+    if (khachHangController.text.isNotEmpty ||
+        noidung.text.isNotEmpty ||
+        tensanpham.text.isNotEmpty ||
+        soluong.text.isNotEmpty) {
+      try {
+        String combinedKhachHangMaSo = "";
+        if (combinedKhachHangMaSoTemp.isNotEmpty) {
+          combinedKhachHangMaSo =
+              "$combinedKhachHangMaSoTemp-${khachHangController.text}-${maSoController.text}";
+        } else {
+          combinedKhachHangMaSo =
+              "${khachHangController.text}-${maSoController.text}";
+        }
+
+        String uri = "http://buffquat13.000webhostapp.com/doanhthulamsan.php";
+
+        var res = await http.post(Uri.parse(uri), body: {
+          "idPhieudoanhthu": idPhieudoanhthu,
+          "thoigiannhanviec": thoigiannhanviec.text,
+          "khachhangmaso": combinedKhachHangMaSo,
+          "noidung": getSelectedOptionsContent(),
+          "tensanpham": tensanpham.text,
+          "soluong": soluong.text,
+          "giao": giao.text,
+          "ve": ve.text,
+        });
+
+        var response = jsonDecode(res.body);
+
+        if (response["Success"] == "true") {
+          print("Thêm doanh thu thành công!");
+          khachHangController.text = "";
+          maSoController.text = "";
+          noidung.text = "";
+          tensanpham.text = "";
+          soluong.text = "";
+          giao.text = "";
+          ve.text = "";
+
+          Navigator.pop(context, true);
+        } else {
+          print("Error!");
+        }
+      } catch (e) {
+        print(e);
+      }
+    } else {
+      print("Vui lòng điền vào ô trống");
+      ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Vui lòng điền vào ô trống!'),
+        duration: Duration(seconds: 2), // Đặt thời gian hiển thị của snack bar
+        backgroundColor: Colors.red,
+      ),
+    );
+    }
+  }
+
+  String combinedKhachHangMaSoTemp = "";
+  String combinedKhachHangMaSoTemp1 = "";
+  String getSelectedOptionsContent() {
+  if (selectedOptions.isNotEmpty) {
+    return selectedOptions.join(", ");
+  } else {
+    return "";
+  }
+}
+  List<String> selectedOptions = []; // Biến cho cái mới
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              alignment: Alignment.center,
+              margin: EdgeInsets.only(top: 50),
+              child: Text(
+                'LÂM SÀN',
+                style: TextStyle(
+                  fontFamily: 'SFUFUTURABOOK',
+                  color: Color.fromARGB(255, 81, 196, 85),
+                  fontWeight: FontWeight.w900,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+           SizedBox(height: 20),
+         Row(
+  mainAxisAlignment: MainAxisAlignment.spaceAround,
+  children: [
+    GestureDetector(
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      onTap: () {
+        setState(() {
+          combinedKhachHangMaSoTemp1 = "BS Nhật";
+          combinedKhachHangMaSoTemp = "";
+        });
+      },
+      child: Column(
+        
+        children: [
+          Transform.scale(
+            scale: _scale1,
+            child: Container(
+               margin: EdgeInsets.only(top: 30),
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: combinedKhachHangMaSoTemp1 == "BS Nhật"
+                    ? Color.fromARGB(255, 81, 196, 85)
+                    : Color.fromARGB(255, 255, 255, 255),
+                borderRadius: BorderRadius.circular(10),
+                border:Border.all(
+                   color: combinedKhachHangMaSoTemp1 == "BS Nhật"
+                    ? Color.fromARGB(255, 81, 196, 85) // Màu border tùy chỉnh khi điều kiện đúng
+                    : Color.fromARGB(255, 81, 196, 85), // Màu border tùy chỉnh khi điều kiện sai
+                  width: 1,
+                ) 
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                combinedKhachHangMaSoTemp1,
+                style: TextStyle(
+                  color: combinedKhachHangMaSoTemp1 == "BS Nhật"
+                      ? Color.fromARGB(255, 81, 196, 85)
+                      : Color.fromARGB(255, 81, 196, 85),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 8), // Khoảng cách giữa văn bản và Container
+          Text(
+            'Hàng BS Nhật', // Văn bản dưới chân
+            style: TextStyle(
+              color: Color.fromARGB(255, 81, 196, 85),
+              fontSize: 12,
+              fontFamily: 'SFUFUTURABOOK',
+              fontWeight: FontWeight.w600
+            ),
+            
+          ),
+        ],
+      ),
+    ),
+    GestureDetector(
+      onTapDown: _onTapDown1,
+      onTapUp: _onTapUp1,
+      onTapCancel: _onTapCancel1,
+      onTap: () {
+        setState(() {
+          combinedKhachHangMaSoTemp = "NO.1";
+          combinedKhachHangMaSoTemp1 = "";
+        });
+      },
+      child: Column(
+        children: [
+          Transform.scale(
+            scale: _scale,
+            child: Container(
+                 margin: EdgeInsets.only(top: 30),
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: combinedKhachHangMaSoTemp == "NO.1"
+                    ? Color.fromARGB(255, 81, 196, 85)
+                    : Color.fromARGB(255, 255, 255, 255),
+                borderRadius: BorderRadius.circular(10),
+                 border:Border.all(
+                   color: combinedKhachHangMaSoTemp1 == "NO.1"
+                    ? Color.fromARGB(255, 81, 196, 85) // Màu border tùy chỉnh khi điều kiện đúng
+                    : Color.fromARGB(255, 81, 196, 85), // Màu border tùy chỉnh khi điều kiện sai
+                  width: 1,
+                ) 
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                combinedKhachHangMaSoTemp,
+                style: TextStyle(
+                  color: combinedKhachHangMaSoTemp == "NO.1"
+                      ? Color.fromARGB(255, 81, 196, 85)
+                      : Color.fromARGB(255, 81, 196, 85),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 8), // Khoảng cách giữa văn bản và Container
+          Text(
+            'Hàng NO.1', // Văn bản dưới chân
+            style: TextStyle(
+            color: Color.fromARGB(255, 81, 196, 85),
+              fontSize: 12,
+              fontFamily: 'SFUFUTURABOOK',
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    ),
+  ],
+),
+
+            SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
+              controller: khachHangController,
+              decoration: InputDecoration(
+                labelText: 'Khách hàng',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
+            ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+            
+
+            SizedBox(height: 10),
+           TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
+              controller: maSoController,
+              decoration: InputDecoration(
+                labelText: 'Mã số',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
+            ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+Wrap(
+  alignment: WrapAlignment.center,
+  spacing: 8.0, // Khoảng cách giữa các mục
+  runSpacing: 8.0, // Khoảng cách giữa các dòng
+  children: congDoanLamSanList.map((congDoan) {
+    final tenCongDoan = congDoan['tencongdoan'];
+    final isSelected = selectedOptions.contains(tenCongDoan);
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (isSelected) {
+            selectedOptions.remove(tenCongDoan);
+          } else {
+            selectedOptions.add(tenCongDoan);
+          }
+        });
+      },
+      child: Column(
+        children: [
+          Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              Transform.scale(
+                scale: isSelected ? _scale : _scale1,
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  margin: EdgeInsets.only(top: 15),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? Color.fromARGB(255, 81, 196, 85)
+                        : Color.fromARGB(255, 255, 255, 255),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Color.fromARGB(255, 81, 196, 85),
+                      width: 1,
+                    ),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    tenCongDoan,
+                    style: TextStyle(
+                      color: isSelected
+                          ? Color.fromARGB(255, 81, 196, 85)
+                          : Colors.white,
+                      fontSize: 10,
+                    ),
+                  ),
+                ),
+              ),
+              if (isSelected)
+                Container(
+                  width: 16,
+                  height: 16,
+                  margin: EdgeInsets.only(bottom: 2, right: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.check,
+                    size: 12,
+                    color: Color.fromARGB(255, 81, 196, 85),
+                  ),
+                ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Text(
+            tenCongDoan,
+            style: TextStyle(
+              color: Color.fromARGB(255, 81, 196, 85),
+              fontSize: 9,
+              fontFamily: 'SFUFUTURABOOK',
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }).toList(),
+),
+
+        SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
+              controller: tensanpham,
+              decoration: InputDecoration(
+                labelText: 'Tên sản phẩm',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
+            ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+               SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
+              controller: soluong,
+              decoration: InputDecoration(
+                labelText: 'Số lượng',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
+            ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+             SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
+              controller: giao,
+              decoration: InputDecoration(
+                labelText: 'Giao',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
+            ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+             SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
+              controller: ve,
+              decoration: InputDecoration(
+                labelText: 'Về',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
+            ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    insertRecordDoanhThu(widget.idPhieudoanhthu);
+                  },
+                  child: Text("Thêm"),
+                ),
+                ElevatedButton(
+           
+                  onPressed: () {
+                    Navigator.pop(context, false);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red,
+                  ),
+                  child: Text("Hủy")
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 
 
@@ -552,14 +2725,16 @@ class _DoanhThuCongViecState extends State<doanhthucongviec> {
 }
 
 
-// Chua xong......
 class DoanhThuData {
   String Thoigiannhanviec;
   String Khachhangmaso;
   String Noidung;
- String Namesanpham;
- String Soluong;
- String idphieudoanhthuu;
+  String Namesanpham;
+  String Soluong;
+  String Giao;
+  String Ve;
+  String idChitietphieudoanhthu;
+  String idphieudoanhthuu;
 
   DoanhThuData({
     required this.Thoigiannhanviec,
@@ -567,6 +2742,9 @@ class DoanhThuData {
     required this.Noidung,
     required this.Namesanpham,
     required this.Soluong,
+    required this.Giao,
+    required this.Ve,
+    required this.idChitietphieudoanhthu,
     required this.idphieudoanhthuu,
   });
 }
@@ -575,8 +2753,7 @@ class chitietphieudoanhthu extends StatefulWidget {
   final String ngayPhieu;
   final String idPhieudoanhthu;
 
-
-  chitietphieudoanhthu({required this.ngayPhieu,required this.idPhieudoanhthu});
+  chitietphieudoanhthu({required this.ngayPhieu, required this.idPhieudoanhthu});
 
   @override
   _chitietphieudoanhthuState createState() => _chitietphieudoanhthuState();
@@ -584,8 +2761,6 @@ class chitietphieudoanhthu extends StatefulWidget {
 
 class _chitietphieudoanhthuState extends State<chitietphieudoanhthu> {
   List<DoanhThuData> danhSachDoanhThu = [];
-
-  
 
   @override
   void initState() {
@@ -601,13 +2776,15 @@ class _chitietphieudoanhthuState extends State<chitietphieudoanhthu> {
       if (response.statusCode == 200) {
         List<dynamic> data = jsonDecode(response.body);
         List<DoanhThuData> doanhThuList = data.map((item) => DoanhThuData(
+              idChitietphieudoanhthu:item['idChitietphieudoanhthu'],
               idphieudoanhthuu: item['idPhieudoanhthu'],
               Thoigiannhanviec: item['Thoigiannhanviec'],
               Khachhangmaso: item['KhachangMaso'],
               Noidung: item['Noidung'],
               Namesanpham: item['Tensanpham'],
               Soluong: item['Soluong'],
-             
+              Giao: item['Giao'],
+              Ve: item['Ve'],
             )).toList();
 
         setState(() {
@@ -621,170 +2798,325 @@ class _chitietphieudoanhthuState extends State<chitietphieudoanhthu> {
     }
   }
 
-@override
-Widget build(BuildContext context) {
-  double screenWidth = MediaQuery.of(context).size.width;
-  double columnWidthPercentage = screenWidth * 0.2; // Ví dụ: mỗi cột chiếm 25% màn hình
-  int totalQuantity = 0;
-  int totalMoney = 0; // Biến để tính tổng số lượng
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double columnWidthPercentage = screenWidth * 0.125;
+    int totalQuantity = 0;
+    int totalMoney = 0;
 
-// Duyệt qua danh sách để tính tổng số lượng
-  for (var item in danhSachDoanhThu) {
-    totalQuantity += int.parse(item.Soluong);
-    totalMoney = totalQuantity * 3000;
-  }
-  String formattedTotalMoney = NumberFormat.currency(locale: 'vi_VN', symbol: '').format(totalMoney);
+    for (var item in danhSachDoanhThu) {
+      totalQuantity += int.parse(item.Soluong);
+      totalMoney = totalQuantity * 3000;
+    }
+    String formattedTotalMoney = NumberFormat.currency(locale: 'vi_VN', symbol: '').format(totalMoney);
 
-  return Scaffold(
-    appBar: AppBar(
-      title: Text(
-        'Phiếu doanh thu: ${widget.ngayPhieu}',
-        style: TextStyle(fontSize: 19),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Phiếu doanh thu: ${widget.ngayPhieu}',
+          style: TextStyle(fontSize: 19),
+        ),
       ),
-    ),
-    body:SingleChildScrollView(
-    child: Container(
-  width: double.infinity,
-  child: SingleChildScrollView(
-    scrollDirection: Axis.horizontal,
-    child: Column(
-      children: [
-        Table(
-          border: TableBorder.all(),
-          columnWidths: {
-            0: FixedColumnWidth(columnWidthPercentage),
-            1: FixedColumnWidth(columnWidthPercentage),
-            2: FixedColumnWidth(columnWidthPercentage),
-            3: FixedColumnWidth(columnWidthPercentage),
-            4: FixedColumnWidth(columnWidthPercentage),
-          },
-          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-          children: [
-            TableRow(
+      body: SingleChildScrollView(
+        child: Container(
+          width: double.infinity,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Column(
               children: [
-                TableCell(
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    child: Text(
-                      'Thời gian nhận việc',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                Table(
+                  border: TableBorder.all(),
+                  columnWidths: {
+                    0: FixedColumnWidth(columnWidthPercentage),
+                    1: FixedColumnWidth(columnWidthPercentage),
+                    2: FixedColumnWidth(columnWidthPercentage),
+                    3: FixedColumnWidth(columnWidthPercentage),
+                    4: FixedColumnWidth(columnWidthPercentage),
+                    5: FixedColumnWidth(columnWidthPercentage),
+                    6: FixedColumnWidth(columnWidthPercentage),
+                    7: FixedColumnWidth(columnWidthPercentage),
+                  },
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  children: [
+                    TableRow(
+                      children: [
+                        TableCell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Thời gian nhận việc',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Khách hàng - Mã số',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Nội dung',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Tên sản phẩm',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Số lượng',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Giao',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Về',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Thao tác',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ),
-                TableCell(
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    child: Text(
-                      'Khách hàng - Mã số',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-                TableCell(
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    child: Text(
-                      'Nội dung',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-                TableCell(
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    child: Text(
-                      'Tên sản phẩm',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-                TableCell(
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    child: Text(
-                      'Số lượng',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
+                    for (var item in danhSachDoanhThu)
+                      TableRow(
+                        children: [
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: Text(item.Thoigiannhanviec),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: Text(item.Khachhangmaso),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: Text(item.Noidung),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: Text(item.Namesanpham),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: Text(item.Soluong),
+                            ),
+                          ),
+                             TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: Text(item.Giao),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: Text(item.Ve),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: IconButton(
+                                icon: Icon(Icons.edit), // Sử dụng biểu tượng chỉnh sửa
+                                onPressed: () {
+                                  _showEditDialog(context, item);
+                                },
+                              ),
+                            ),
+                          ),
+
+                        ],
+                      ),
+                  ],
                 ),
               ],
             ),
-            for (var item in danhSachDoanhThu)
-              TableRow(
-                children: [
-                  TableCell(
-                    verticalAlignment: TableCellVerticalAlignment.middle,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                      child: Text(item.Thoigiannhanviec),
-                    ),
-                  ),
-                  TableCell(
-                    verticalAlignment: TableCellVerticalAlignment.middle,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                      child: Text(item.Khachhangmaso),
-                    ),
-                  ),
-                  TableCell(
-                    verticalAlignment: TableCellVerticalAlignment.middle,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                      child: Text(item.Noidung),
-                    ),
-                  ),
-                  TableCell(
-                    verticalAlignment: TableCellVerticalAlignment.middle,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                      child: Text(item.Namesanpham),
-                    ),
-                  ),
-                  TableCell(
-                    verticalAlignment: TableCellVerticalAlignment.middle,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                      child: Text(item.Soluong),
-                    ),
-                  ),
-                ],
-              ),
-          ],
-        ),
-      ],
-    ),
-  ),
-),
-    ),
-    floatingActionButton: FloatingActionButton(
-      onPressed: () async {
-        bool success = await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => themdoanhthu(
-              idPhieudoanhthu: widget.idPhieudoanhthu,
-            ),
           ),
-        );
-        if (success == true) {
-          fetchDataSudungDoanhThu();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Thêm thành công!'),
-              duration: Duration(seconds: 2),
-              behavior: SnackBarBehavior.floating, // Hiển thị phía trên
-              backgroundColor: Colors.green, // Thay đổi màu nền
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          bool success = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => themdoanhthu(
+                idPhieudoanhthu: widget.idPhieudoanhthu,
+              ),
             ),
           );
-        }
-        
-      },
-      child: Icon(Icons.add),
-    ),
-    
+          if (success == true) {
+            fetchDataSudungDoanhThu();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Thêm thành công!'),
+                duration: Duration(seconds: 2),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+        },
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+
+Future<void> _showEditDialog(BuildContext context, DoanhThuData doanhThu) async {
+  TextEditingController _thoiGianController = TextEditingController(text: doanhThu.Thoigiannhanviec);
+  TextEditingController _khachHangController = TextEditingController(text: doanhThu.Khachhangmaso);
+  TextEditingController _noiDungController = TextEditingController(text: doanhThu.Noidung);
+  TextEditingController _tenSanPhamController = TextEditingController(text: doanhThu.Namesanpham);
+  TextEditingController _soLuongController = TextEditingController(text: doanhThu.Soluong);
+  TextEditingController _giaoController = TextEditingController(text: doanhThu.Giao);
+  TextEditingController _veController = TextEditingController(text: doanhThu.Ve);
+
+  await showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Chỉnh sửa phiếu doanh thu'),
+        content: SingleChildScrollView( // Bao bọc nội dung trong SingleChildScrollView
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _thoiGianController,
+                decoration: InputDecoration(labelText: 'Thời gian nhận việc'),
+                enabled: false,
+              ),
+              TextFormField(
+                controller: _khachHangController,
+                decoration: InputDecoration(labelText: 'Khách hàng - Mã số'),
+              ),
+              TextFormField(
+                controller: _noiDungController,
+                decoration: InputDecoration(labelText: 'Nội dung'),
+              ),
+              TextFormField(
+                controller: _tenSanPhamController,
+                decoration: InputDecoration(labelText: 'Tên sản phẩm'),
+              ),
+              TextFormField(
+                controller: _soLuongController,
+                decoration: InputDecoration(labelText: 'Số lượng'),
+              ),
+               TextFormField(
+                controller: _giaoController,
+                decoration: InputDecoration(labelText: 'Giao'),
+              ),
+              TextFormField(
+                controller: _veController,
+                decoration: InputDecoration(labelText: 'Về'),
+              ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              // Lấy giá trị mới từ các trường nhập liệu
+              String thoiGianMoi = _thoiGianController.text;
+              String khachHangMoi = _khachHangController.text;
+              String noiDungMoi = _noiDungController.text;
+              String tenSanPhamMoi = _tenSanPhamController.text;
+              String soLuongMoi = _soLuongController.text;
+              String giao = _giaoController.text;
+              String ve = _veController.text;
+
+              // Tạo dữ liệu JSON để gửi lên API
+              Map<String, String> data = {
+                'idChitietphieudoanhthu': doanhThu.idChitietphieudoanhthu,
+                'thoiGian': thoiGianMoi,
+                'khachHang': khachHangMoi,
+                'noiDung': noiDungMoi,
+                'tenSanPham': tenSanPhamMoi,
+                'soLuong': soLuongMoi,
+                'giao': giao,
+                've': ve,
+              };
+
+              // Gửi yêu cầu POST đến API
+              String apiUrl = "http://buffquat13.000webhostapp.com/edit_doanhthu.php";
+              var response = await http.post(Uri.parse(apiUrl), body: data);
+
+              if (response.statusCode == 200) {
+                // Xử lý phản hồi từ API nếu cần
+                print("Cập nhật thành công");
+                // Đóng hộp thoại chỉnh sửa
+                Navigator.of(context).pop();
+                // Cập nhật lại danh sách chi tiết phiếu doanh thu
+                fetchDataSudungDoanhThu();
+              } else {
+                print("Lỗi khi cập nhật dữ liệu: ${response.statusCode}");
+              }
+            },
+            child: Text('Lưu'),
+          ),
+        ],
+      );
+    },
   );
 }
-
 }
 
 
@@ -804,6 +3136,8 @@ class _ThemDoanhThuScreenState extends State<themdoanhthu> {
   TextEditingController tensanpham = TextEditingController();
   TextEditingController soluong = TextEditingController();
   TextEditingController thoigiannhanviec = TextEditingController();
+  TextEditingController giao = TextEditingController();
+  TextEditingController ve = TextEditingController();
 
   List<dynamic> congDoanList = [];
   Future<void> fetchData() async {
@@ -900,6 +3234,8 @@ class _ThemDoanhThuScreenState extends State<themdoanhthu> {
           "noidung": getSelectedOptionsContent(),
           "tensanpham": tensanpham.text,
           "soluong": soluong.text,
+          "giao": giao.text,
+          "ve": ve.text,
         });
 
         var response = jsonDecode(res.body);
@@ -911,6 +3247,8 @@ class _ThemDoanhThuScreenState extends State<themdoanhthu> {
           noidung.text = "";
           tensanpham.text = "";
           soluong.text = "";
+          giao.text = "";
+          ve.text = "";
 
           Navigator.pop(context, true);
         } else {
@@ -1281,6 +3619,78 @@ Wrap(
               controller: soluong,
               decoration: InputDecoration(
                 labelText: 'Số lượng',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
+            ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+             SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
+              controller: giao,
+              decoration: InputDecoration(
+                labelText: 'Giao',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
+            ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+             SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
+              controller: ve,
+              decoration: InputDecoration(
+                labelText: 'Về',
                   labelStyle: TextStyle(
                     color: Color.fromARGB(255, 81, 196, 85),
                     fontFamily: 'SFUFUTURABOOK',
@@ -2585,6 +4995,7 @@ class VatLieuData {
   String Khachhangmaso;
   String Soluongsudung;
  String Conlaicuoingay;
+ String idChitietphieuvatlieu;
  String idphieuvatlieuu;
 
   VatLieuData({
@@ -2594,6 +5005,7 @@ class VatLieuData {
     required this.Khachhangmaso,
     required this.Soluongsudung,
     required this.Conlaicuoingay,
+    required this.idChitietphieuvatlieu,
     required this.idphieuvatlieuu,
   });
 }
@@ -2627,6 +5039,7 @@ class _chitietphieuvatlieuState extends State<chitietphieuvatlieu> {
       if (response.statusCode == 200) {
         List<dynamic> data = jsonDecode(response.body);
         List<VatLieuData> vatLieuList = data.map((item) => VatLieuData(
+              idChitietphieuvatlieu: item['idVatlieu'],
               idphieuvatlieuu: item['idPhieuvatlieu'],
               Thoigiannhapphieu: item['Thoigiannhapphieu'],
               Tensanpham: item['Tensp'],
@@ -2650,7 +5063,7 @@ class _chitietphieuvatlieuState extends State<chitietphieuvatlieu> {
 @override
 Widget build(BuildContext context) {
   double screenWidth = MediaQuery.of(context).size.width;
-  double columnWidthPercentage = screenWidth * 0.167; // Ví dụ: mỗi cột chiếm 25% màn hình
+  double columnWidthPercentage = screenWidth * 0.1428; // Ví dụ: mỗi cột chiếm 25% màn hình
 
   return Scaffold(
     appBar: AppBar(
@@ -2676,6 +5089,7 @@ Widget build(BuildContext context) {
                 3: FixedColumnWidth(columnWidthPercentage),
                 4: FixedColumnWidth(columnWidthPercentage), 
                 5: FixedColumnWidth(columnWidthPercentage), // Độ rộng cột 3
+                6: FixedColumnWidth(columnWidthPercentage), 
               },
               defaultVerticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
               children: [
@@ -2741,6 +5155,16 @@ Widget build(BuildContext context) {
                         ),
                       ),
                     ),
+                      TableCell(
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        // Màu nền
+                        child: Text(
+                          'Chỉnh sửa',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 // Thêm các hàng dữ liệu tương tự như dưới đây
@@ -2789,6 +5213,18 @@ Widget build(BuildContext context) {
                           child: Text(item.Conlaicuoingay),
                         ),
                       ),
+                       TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: IconButton(
+                                icon: Icon(Icons.edit), // Sử dụng biểu tượng chỉnh sửa
+                                onPressed: () {
+                                  _showEditDialog(context, item);
+                                },
+                              ),
+                            ),
+                          ),
                     ],
                   ),
               ],
@@ -2823,9 +5259,108 @@ Widget build(BuildContext context) {
       child: Icon(Icons.add),
     ),
   );
+  
+}
+Future<void> _showEditDialog(BuildContext context, VatLieuData vatlieu) async {
+  TextEditingController _thoiGianController = TextEditingController(text: vatlieu.Thoigiannhapphieu);
+  TextEditingController _tenSPController = TextEditingController(text: vatlieu.Tensanpham);
+  TextEditingController _tonDauNgayController = TextEditingController(text: vatlieu.Tondaungay);
+  TextEditingController _KHMSController = TextEditingController(text: vatlieu.Khachhangmaso);
+  TextEditingController _soLuongSDController = TextEditingController(text: vatlieu.Soluongsudung);
+  TextEditingController _conLaiController = TextEditingController(text: vatlieu.Conlaicuoingay);
+
+
+  await showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Chỉnh sửa phiếu doanh thu'),
+        content: SingleChildScrollView( // Bao bọc nội dung trong SingleChildScrollView
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _thoiGianController,
+                decoration: InputDecoration(labelText: 'Thời gian nhập phiếu'),
+                enabled: false,
+              ),
+              TextFormField(
+                controller: _tenSPController,
+                decoration: InputDecoration(labelText: 'Tên sản phẩm'),
+              ),
+              TextFormField(
+                controller: _tonDauNgayController,
+                decoration: InputDecoration(labelText: 'Tồn đầu ngày'),
+              ),
+              TextFormField(
+                controller: _KHMSController,
+                decoration: InputDecoration(labelText: 'Khách hàng - Mã số'),
+              ),
+               TextFormField(
+                controller: _soLuongSDController,
+                decoration: InputDecoration(labelText: 'Số lượng sử dụng'),
+              ),
+              TextFormField(
+                controller: _conLaiController,
+                decoration: InputDecoration(labelText: 'Còn lại cuối ngày'),
+              ),
+              
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              // Lấy giá trị mới từ các trường nhập liệu
+              String thoiGianMoi = _thoiGianController.text;
+              String tenSPMoi = _tenSPController.text;
+              String tonDauNgayMoi = _tonDauNgayController.text;
+              String KHMSMoi = _KHMSController.text;
+              String soLuongSDMoi = _soLuongSDController.text;
+              String conlaiMoi = _conLaiController.text;
+            
+
+              // Tạo dữ liệu JSON để gửi lên API
+              Map<String, String> data = {
+                'idChitietphieuvatlieu': vatlieu.idChitietphieuvatlieu,
+                'thoiGian': thoiGianMoi,
+                'tenSP': tenSPMoi,
+                'tondaungay': tonDauNgayMoi,
+                'KHMS': KHMSMoi,
+                'soLuong': soLuongSDMoi,
+                'conlai': conlaiMoi,
+              };
+
+              // Gửi yêu cầu POST đến API
+              String apiUrl = "http://buffquat13.000webhostapp.com/edit_vatlieu.php";
+              var response = await http.post(Uri.parse(apiUrl), body: data);
+
+              if (response.statusCode == 200) {
+                // Xử lý phản hồi từ API nếu cần
+                print("Cập nhật thành công");
+                // Đóng hộp thoại chỉnh sửa
+                Navigator.of(context).pop();
+                // Cập nhật lại danh sách chi tiết phiếu doanh thu
+                fetchDataSudungVatLieu();
+              } else {
+                print("Lỗi khi cập nhật dữ liệu: ${response.statusCode}");
+              }
+            },
+            child: Text('Lưu'),
+          ),
+        ],
+      );
+    },
+  );
+}
 }
 
-}
+
 
 
 
