@@ -306,8 +306,8 @@ class chonphieulamsan extends StatelessWidget {
                   ),
                 ),
               ),
-              ChonPhieuItem(title: 'PHIẾU DOANH THU', userId: userId),
-              ChonPhieuItem(title: 'PHIẾU VẬT LIỆU', userId: userId),
+              ChonPhieuItemLamSan(title: 'PHIẾU DOANH THU', userId: userId),
+              ChonPhieuItemLamSan(title: 'PHIẾU VẬT LIỆU', userId: userId),
             ],
           ),
           Positioned(
