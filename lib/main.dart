@@ -3783,12 +3783,7 @@ Wrap(
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    insertRecordDoanhThu(widget.idPhieudoanhthu);
-                  },
-                  child: Text("Thêm"),
-                ),
+               
                 ElevatedButton(
            
                   onPressed: () {
@@ -3798,6 +3793,12 @@ Wrap(
                     primary: Colors.red,
                   ),
                   child: Text("Hủy")
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    insertRecordDoanhThu(widget.idPhieudoanhthu);
+                  },
+                  child: Text("Thêm"),
                 ),
               ],
             ),
