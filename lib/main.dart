@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-
+import 'package:dropdown_button2/dropdown_button2.dart';
 
 
 void main() async{
@@ -446,7 +446,7 @@ class _VatLieuLamSanScreenState extends State<vatlieulamsan> {
  Future<void> themphieuvatlieu() async {
     if(ngaynhapphieu.text!=""){
       try{
-        String uri = "http://buffquat13.000webhostapp.com/themphieuvatlieu_lamsan.php";
+        String uri = "http://duongthangne.000webhostapp.com/themphieuvatlieu_lamsan.php";
         var res=await http.post(Uri.parse(uri),body: {
           "ngaynhapphieu":ngaynhapphieu.text,
           "uid":widget.userId,
@@ -483,7 +483,7 @@ class _VatLieuLamSanScreenState extends State<vatlieulamsan> {
 
   Future<void> getphieuvatlieu() async {
     try {
-      String uri = "http://buffquat13.000webhostapp.com/get_phieuvatlieu_lamsan.php";
+      String uri = "http://duongthangne.000webhostapp.com/get_phieuvatlieu_lamsan.php";
       var response = await http.get(Uri.parse(uri));
 
       if (response.statusCode == 200) {
@@ -505,7 +505,7 @@ class _VatLieuLamSanScreenState extends State<vatlieulamsan> {
 
   Future<void> xoaPhieuVatLieu(String idPhieuvatlieu) async {
     try {
-      String uri = "http://buffquat13.000webhostapp.com/xoaphieuvatlieu_lamsan.php";
+      String uri = "http://duongthangne.000webhostapp.com/xoaphieuvatlieu_lamsan.php";
       var res = await http.post(Uri.parse(uri), body: {
         "idPhieuvatlieu": idPhieuvatlieu,
       });
@@ -752,7 +752,7 @@ class _chitietphieuvatlieulamsanState extends State<chitietphieuvatlieulamsan> {
 
   Future<void> fetchDataSudungVatLieu() async {
     try {
-      String uri = "http://buffquat13.000webhostapp.com/get_vatlieu_lamsan.php";
+      String uri = "http://duongthangne.000webhostapp.com/get_vatlieu_lamsan.php";
       var response = await http.get(Uri.parse(uri));
 
       if (response.statusCode == 200) {
@@ -958,8 +958,8 @@ Widget build(BuildContext context) {
         bool success = await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => themvatlieu(
-              idPhieuvatlieu: widget.idPhieuvatlieu,
+            builder: (context) => themvatlieulamsan(
+              idPhieuvatlieulamsan: widget.idPhieuvatlieu,
             ),
           ),
         );
@@ -1058,7 +1058,7 @@ Future<void> _showEditDialog(BuildContext context, VatLieuLamSanData vatlieu) as
               };
 
               // Gửi yêu cầu POST đến API
-              String apiUrl = "http://buffquat13.000webhostapp.com/edit_vatlieu_lamsan.php";
+              String apiUrl = "http://duongthangne.000webhostapp.com/edit_vatlieu_lamsan.php";
               var response = await http.post(Uri.parse(apiUrl), body: data);
 
               if (response.statusCode == 200) {
@@ -1080,6 +1080,308 @@ Future<void> _showEditDialog(BuildContext context, VatLieuLamSanData vatlieu) as
   );
 }
 }
+
+class themvatlieulamsan extends StatefulWidget {
+ 
+ final String idPhieuvatlieulamsan;
+  themvatlieulamsan({required this.idPhieuvatlieulamsan});
+  
+  @override
+  _ThemVatLieuLamSanScreenState createState() => _ThemVatLieuLamSanScreenState();
+}
+
+
+class _ThemVatLieuLamSanScreenState extends State<themvatlieulamsan>{
+
+        TextEditingController thoigiannhapphieu = TextEditingController();
+        TextEditingController tensanpham = TextEditingController();
+        TextEditingController tondaungay = TextEditingController();
+        TextEditingController khachhangmaso = TextEditingController();
+        TextEditingController soluongsudung = TextEditingController();
+        TextEditingController conlaicuoingay = TextEditingController();
+       
+     
+   
+
+ @override
+  void initState(){
+    super.initState();
+    setNgayNhapPhieu();
+  }
+  void setNgayNhapPhieu(){
+     DateTime now = DateTime.now();
+    // Gán giá trị ngày tháng năm vào trường ngaynhapphieu
+    thoigiannhapphieu.text = "${now.hour}:${now.minute}";
+  }
+  Future<void> insertrecordvatlieu(String idPhieuvatlieu) async {
+    if(tensanpham.text!="" || tondaungay.text!= "" || soluongsudung.text!=""||conlaicuoingay.text!=""||khachhangmaso!=""){
+      try{
+
+        String uri = "http://duongthangne.000webhostapp.com/vatlieulamsan.php";
+
+        var res=await http.post(Uri.parse(uri),body: {
+            "idPhieuvatlieu": idPhieuvatlieu,
+            "thoigiannhapphieu":thoigiannhapphieu.text,
+            "tensp":tensanpham.text,
+            "tondaungay":tondaungay.text,
+            "khachhangmaso":khachhangmaso.text,
+            "soluongsudung":soluongsudung.text,
+            "conlaicuoingay":conlaicuoingay.text,    
+        });
+        var response = jsonDecode(res.body);
+        if(response["Success"]=="true"){
+          print("Them vật liệu thanh cong!");
+          tensanpham.text="";
+          tondaungay.text="";
+          khachhangmaso.text="";
+          soluongsudung.text="";
+          conlaicuoingay.text="";
+      
+         Navigator.pop(context, true);
+        }
+        else{
+          print("Lỗi!");
+        }
+      }
+      catch(e){
+        print(e);
+      }
+
+    }
+    else{
+      print("Lam on dien vao o trong");
+    }
+  }
+
+ 
+  Widget build(BuildContext context) {
+    return Scaffold(
+      
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+                        SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
+              controller: tensanpham,
+              decoration: InputDecoration(
+                labelText: 'Tên sản phẩm',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
+            ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+                        SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
+              controller: tondaungay,
+              decoration: InputDecoration(
+                labelText: 'Nhận trong ngày',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
+            ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+                         SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
+              controller: khachhangmaso,
+              decoration: InputDecoration(
+                labelText: 'Khách hàng - Mã số',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
+            ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+                        SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
+              controller: soluongsudung,
+              keyboardType: TextInputType.number, // Đặt kiểu bàn phím cho TextInput
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Chỉ cho phép nhập số
+              decoration: InputDecoration(
+                labelText: 'Số lượng sử dụng',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
+            ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+                         SizedBox(height: 20),
+          TextFormField(
+             style: TextStyle(
+                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
+              ),
+              controller: conlaicuoingay,
+              decoration: InputDecoration(
+                labelText: 'Còn lại cuối ngày',
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 81, 196, 85),
+                    fontFamily: 'SFUFUTURABOOK',
+                    fontWeight: FontWeight.w600
+                  ),
+                  
+                suffix: Text('-'),
+                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
+                filled: true,
+                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
+                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
+                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
+                ),
+               enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ),
+                      focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
+            ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
+                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    ),
+              ),
+            ),
+          
+            // TextFormField(
+            //   controller: ngaynhapphieu,
+            //   decoration: InputDecoration(labelText: 'Ngay nhap phieu'),
+            //   enabled: false,
+            // ),
+           SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                
+                ElevatedButton(
+           
+                  onPressed: () {
+                    Navigator.pop(context, false);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red,
+                  ),
+                  child: Text("Hủy")
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    insertrecordvatlieu(widget.idPhieuvatlieulamsan);
+                  },
+                  child: Text("Thêm"),
+                ),
+              ],
+            ),
+
+          ],
+       ),
+      ),
+    );
+  }
+}
+
+
 
 
 
@@ -1130,7 +1432,7 @@ class _DoanhThuCongViecLamSanState extends State<doanhthucongvieclamsan> {
   Future<void> themPhieuDoanhThu() async {
     if (ngayNhapPhieu.text != "") {
       try {
-        String uri = "http://buffquat13.000webhostapp.com/themphieudoanhthulamsan.php";
+        String uri = "http://duongthangne.000webhostapp.com/themphieudoanhthulamsan.php";
         var res = await http.post(Uri.parse(uri), body: {
           "ngaynhapphieu": ngayNhapPhieu.text,
           "uid": widget.userId,
@@ -1164,7 +1466,7 @@ class _DoanhThuCongViecLamSanState extends State<doanhthucongvieclamsan> {
 
   Future<void> getPhieuDoanhThu() async {
     try {
-      String uri = "http://buffquat13.000webhostapp.com/get_phieudoanhthulamsan.php";
+      String uri = "http://duongthangne.000webhostapp.com/get_phieudoanhthulamsan.php";
       var response = await http.get(Uri.parse(uri));
 
       if (response.statusCode == 200) {
@@ -1186,7 +1488,7 @@ class _DoanhThuCongViecLamSanState extends State<doanhthucongvieclamsan> {
 
   Future<void> xoaPhieuDoanhThu(String idPhieudoanhthu) async {
     try {
-      String uri = "http://buffquat13.000webhostapp.com/xoaphieudoanhthulamsan.php";
+      String uri = "http://duongthangne.000webhostapp.com/xoaphieudoanhthulamsan.php";
       var res = await http.post(Uri.parse(uri), body: {
         "idPhieudoanhthu": idPhieudoanhthu,
       });
@@ -1393,10 +1695,7 @@ class DoanhThuDataLamSan {
   String Thoigiannhanviec;
   String Khachhangmaso;
   String Noidung;
-  String Namesanpham;
-  String Soluong;
-  String Giao;
-  String Ve;
+  String Thanhtien;
   String idChitietphieudoanhthu;
   String idphieudoanhthuu;
 
@@ -1404,10 +1703,7 @@ class DoanhThuDataLamSan {
     required this.Thoigiannhanviec,
     required this.Khachhangmaso,
     required this.Noidung,
-    required this.Namesanpham,
-    required this.Soluong,
-    required this.Giao,
-    required this.Ve,
+    required this.Thanhtien,
     required this.idChitietphieudoanhthu,
     required this.idphieudoanhthuu,
   });
@@ -1434,7 +1730,7 @@ class _chitietphieudoanhthulamsanState extends State<chitietphieudoanhthulamsan>
 
   Future<void> fetchDataSudungDoanhThu() async {
     try {
-      String uri = "http://buffquat13.000webhostapp.com/get_doanhthulamsan.php";
+      String uri = "http://duongthangne.000webhostapp.com/get_doanhthulamsan.php";
       var response = await http.get(Uri.parse(uri));
 
       if (response.statusCode == 200) {
@@ -1445,10 +1741,7 @@ class _chitietphieudoanhthulamsanState extends State<chitietphieudoanhthulamsan>
               Thoigiannhanviec: item['Thoigiannhanviec'],
               Khachhangmaso: item['KhachangMaso'],
               Noidung: item['Noidung'],
-              Namesanpham: item['Tensanpham'],
-              Soluong: item['Soluong'],
-              Giao: item['Giao'],
-              Ve: item['Ve'],
+              Thanhtien: item['ThanhTien'],
             )).toList();
 
         setState(() {
@@ -1465,7 +1758,10 @@ class _chitietphieudoanhthulamsanState extends State<chitietphieudoanhthulamsan>
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double columnWidthPercentage = screenWidth * 0.125;
+    double columnWidthPercentage1 = screenWidth * 0.2;
+    double columnWidthPercentage2 = screenWidth * 0.3;
+    double columnWidthPercentage3 = screenWidth * 0.3;
+    double columnWidthPercentage4 = screenWidth * 0.2;
    
     return Scaffold(
       appBar: AppBar(
@@ -1484,28 +1780,16 @@ class _chitietphieudoanhthulamsanState extends State<chitietphieudoanhthulamsan>
                 Table(
                   border: TableBorder.all(),
                   columnWidths: {
-                    0: FixedColumnWidth(columnWidthPercentage),
-                    1: FixedColumnWidth(columnWidthPercentage),
-                    2: FixedColumnWidth(columnWidthPercentage),
-                    3: FixedColumnWidth(columnWidthPercentage),
-                    4: FixedColumnWidth(columnWidthPercentage),
-                    5: FixedColumnWidth(columnWidthPercentage),
-                    6: FixedColumnWidth(columnWidthPercentage),
-                    7: FixedColumnWidth(columnWidthPercentage),
+                    0: FixedColumnWidth(columnWidthPercentage1),
+                    1: FixedColumnWidth(columnWidthPercentage2),
+                    2: FixedColumnWidth(columnWidthPercentage3),
+                    3: FixedColumnWidth(columnWidthPercentage4),
                   },
                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                   children: [
                     TableRow(
                       children: [
-                        TableCell(
-                          child: Container(
-                            padding: EdgeInsets.all(8),
-                            child: Text(
-                              'Thời gian nhận việc',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
+                   
                         TableCell(
                           child: Container(
                             padding: EdgeInsets.all(8),
@@ -1528,34 +1812,7 @@ class _chitietphieudoanhthulamsanState extends State<chitietphieudoanhthulamsan>
                           child: Container(
                             padding: EdgeInsets.all(8),
                             child: Text(
-                              'Tên sản phẩm',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            padding: EdgeInsets.all(8),
-                            child: Text(
-                              'Số lượng',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            padding: EdgeInsets.all(8),
-                            child: Text(
-                              'Giao',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                        TableCell(
-                          child: Container(
-                            padding: EdgeInsets.all(8),
-                            child: Text(
-                              'Về',
+                              'Thành tiền(VND)',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -1578,13 +1835,6 @@ class _chitietphieudoanhthulamsanState extends State<chitietphieudoanhthulamsan>
                             verticalAlignment: TableCellVerticalAlignment.middle,
                             child: Container(
                               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                              child: Text(item.Thoigiannhanviec),
-                            ),
-                          ),
-                          TableCell(
-                            verticalAlignment: TableCellVerticalAlignment.middle,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                               child: Text(item.Khachhangmaso),
                             ),
                           ),
@@ -1599,30 +1849,16 @@ class _chitietphieudoanhthulamsanState extends State<chitietphieudoanhthulamsan>
                             verticalAlignment: TableCellVerticalAlignment.middle,
                             child: Container(
                               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                              child: Text(item.Namesanpham),
+                              child: Text(
+                                item.Thanhtien.toString().replaceAllMapped(
+                                  RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                                  (Match match) => '${match[1]}.',
+                                ),
+                              ),
                             ),
                           ),
-                          TableCell(
-                            verticalAlignment: TableCellVerticalAlignment.middle,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                              child: Text(item.Soluong),
-                            ),
-                          ),
-                             TableCell(
-                            verticalAlignment: TableCellVerticalAlignment.middle,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                              child: Text(item.Giao),
-                            ),
-                          ),
-                          TableCell(
-                            verticalAlignment: TableCellVerticalAlignment.middle,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                              child: Text(item.Ve),
-                            ),
-                          ),
+
+                      
                           TableCell(
                             verticalAlignment: TableCellVerticalAlignment.middle,
                             child: Container(
@@ -1673,13 +1909,9 @@ class _chitietphieudoanhthulamsanState extends State<chitietphieudoanhthulamsan>
   }
 
 Future<void> _showEditDialog(BuildContext context, DoanhThuDataLamSan doanhThu) async {
-  TextEditingController _thoiGianController = TextEditingController(text: doanhThu.Thoigiannhanviec);
   TextEditingController _khachHangController = TextEditingController(text: doanhThu.Khachhangmaso);
   TextEditingController _noiDungController = TextEditingController(text: doanhThu.Noidung);
-  TextEditingController _tenSanPhamController = TextEditingController(text: doanhThu.Namesanpham);
-  TextEditingController _soLuongController = TextEditingController(text: doanhThu.Soluong);
-  TextEditingController _giaoController = TextEditingController(text: doanhThu.Giao);
-  TextEditingController _veController = TextEditingController(text: doanhThu.Ve);
+  TextEditingController _thanhTienController = TextEditingController(text: doanhThu.Thanhtien);
 
   await showDialog(
     context: context,
@@ -1690,11 +1922,6 @@ Future<void> _showEditDialog(BuildContext context, DoanhThuDataLamSan doanhThu) 
           child: Column(
             children: [
               TextFormField(
-                controller: _thoiGianController,
-                decoration: InputDecoration(labelText: 'Thời gian nhận việc'),
-                enabled: false,
-              ),
-              TextFormField(
                 controller: _khachHangController,
                 decoration: InputDecoration(labelText: 'Khách hàng - Mã số'),
               ),
@@ -1703,21 +1930,10 @@ Future<void> _showEditDialog(BuildContext context, DoanhThuDataLamSan doanhThu) 
                 decoration: InputDecoration(labelText: 'Nội dung'),
               ),
               TextFormField(
-                controller: _tenSanPhamController,
-                decoration: InputDecoration(labelText: 'Tên sản phẩm'),
+                controller: _thanhTienController,
+                decoration: InputDecoration(labelText: 'Thành tiền'),
               ),
-              TextFormField(
-                controller: _soLuongController,
-                decoration: InputDecoration(labelText: 'Số lượng'),
-              ),
-               TextFormField(
-                controller: _giaoController,
-                decoration: InputDecoration(labelText: 'Giao'),
-              ),
-              TextFormField(
-                controller: _veController,
-                decoration: InputDecoration(labelText: 'Về'),
-              ),
+         
             ],
           ),
         ),
@@ -1731,28 +1947,20 @@ Future<void> _showEditDialog(BuildContext context, DoanhThuDataLamSan doanhThu) 
           ElevatedButton(
             onPressed: () async {
               // Lấy giá trị mới từ các trường nhập liệu
-              String thoiGianMoi = _thoiGianController.text;
               String khachHangMoi = _khachHangController.text;
               String noiDungMoi = _noiDungController.text;
-              String tenSanPhamMoi = _tenSanPhamController.text;
-              String soLuongMoi = _soLuongController.text;
-              String giao = _giaoController.text;
-              String ve = _veController.text;
+              String thanhTienMoi = _thanhTienController.text;
 
               // Tạo dữ liệu JSON để gửi lên API
               Map<String, String> data = {
                 'idChitietphieudoanhthu': doanhThu.idChitietphieudoanhthu,
-                'thoiGian': thoiGianMoi,
                 'khachHang': khachHangMoi,
                 'noiDung': noiDungMoi,
-                'tenSanPham': tenSanPhamMoi,
-                'soLuong': soLuongMoi,
-                'giao': giao,
-                've': ve,
+                'thanhTien': thanhTienMoi,
               };
 
               // Gửi yêu cầu POST đến API
-              String apiUrl = "http://buffquat13.000webhostapp.com/edit_doanhthu_lamsan.php";
+              String apiUrl = "http://duongthangne.000webhostapp.com/edit_doanhthu_lamsan.php";
               var response = await http.post(Uri.parse(apiUrl), body: data);
 
               if (response.statusCode == 200) {
@@ -1789,15 +1997,14 @@ class _ThemDoanhThuLamSanScreenState extends State<themdoanhthulamsan> {
   TextEditingController khachHangController = TextEditingController();
   TextEditingController maSoController = TextEditingController();
   TextEditingController noidung = TextEditingController();
-  TextEditingController tensanpham = TextEditingController();
-  TextEditingController soluong = TextEditingController();
+  TextEditingController thanhtien = TextEditingController();
+
   TextEditingController thoigiannhanviec = TextEditingController();
-  TextEditingController giao = TextEditingController();
-  TextEditingController ve = TextEditingController();
+
 
   List<dynamic> congDoanLamSanList = [];
   Future<void> fetchData() async {
-    final response = await http.get(Uri.parse('https://buffquat13.000webhostapp.com/congdoanlamsan.php'));
+    final response = await http.get(Uri.parse('https://duongthangne.000webhostapp.com/congdoanlamsan.php'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -1878,17 +2085,14 @@ class _ThemDoanhThuLamSanScreenState extends State<themdoanhthulamsan> {
               "${khachHangController.text}-${maSoController.text}";
         }
 
-        String uri = "http://buffquat13.000webhostapp.com/doanhthulamsan.php";
+        String uri = "http://duongthangne.000webhostapp.com/doanhthulamsan.php";
 
         var res = await http.post(Uri.parse(uri), body: {
           "idPhieudoanhthu": idPhieudoanhthu,
           "thoigiannhanviec": thoigiannhanviec.text,
           "khachhangmaso": combinedKhachHangMaSo,
-          "noidung": getSelectedOptionsContent(),
-          "tensanpham": tensanpham.text,
-          "soluong": soluong.text,
-          "giao": giao.text,
-          "ve": ve.text,
+          "noidung": noidung.text,
+          "thanhtien": thanhtien.text,
         });
 
         var response = jsonDecode(res.body);
@@ -1898,10 +2102,7 @@ class _ThemDoanhThuLamSanScreenState extends State<themdoanhthulamsan> {
           khachHangController.text = "";
           maSoController.text = "";
           noidung.text = "";
-          tensanpham.text = "";
-          soluong.text = "";
-          giao.text = "";
-          ve.text = "";
+          thanhtien.text = "";
 
           Navigator.pop(context, true);
         } else {
@@ -1930,136 +2131,6 @@ class _ThemDoanhThuLamSanScreenState extends State<themdoanhthulamsan> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              alignment: Alignment.center,
-              margin: EdgeInsets.only(top: 50),
-              child: Text(
-                'LÂM SÀN',
-                style: TextStyle(
-                  fontFamily: 'SFUFUTURABOOK',
-                  color: Color.fromARGB(255, 81, 196, 85),
-                  fontWeight: FontWeight.w900,
-                  fontSize: 15,
-                ),
-              ),
-            ),
-           SizedBox(height: 20),
-         Row(
-  mainAxisAlignment: MainAxisAlignment.spaceAround,
-  children: [
-    GestureDetector(
-      onTapDown: _onTapDown,
-      onTapUp: _onTapUp,
-      onTapCancel: _onTapCancel,
-      onTap: () {
-        setState(() {
-          combinedKhachHangMaSoTemp1 = "BS Nhật";
-          combinedKhachHangMaSoTemp = "";
-        });
-      },
-      child: Column(
-        
-        children: [
-          Transform.scale(
-            scale: _scale1,
-            child: Container(
-               margin: EdgeInsets.only(top: 30),
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: combinedKhachHangMaSoTemp1 == "BS Nhật"
-                    ? Color.fromARGB(255, 81, 196, 85)
-                    : Color.fromARGB(255, 255, 255, 255),
-                borderRadius: BorderRadius.circular(10),
-                border:Border.all(
-                   color: combinedKhachHangMaSoTemp1 == "BS Nhật"
-                    ? Color.fromARGB(255, 81, 196, 85) // Màu border tùy chỉnh khi điều kiện đúng
-                    : Color.fromARGB(255, 81, 196, 85), // Màu border tùy chỉnh khi điều kiện sai
-                  width: 1,
-                ) 
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                combinedKhachHangMaSoTemp1,
-                style: TextStyle(
-                  color: combinedKhachHangMaSoTemp1 == "BS Nhật"
-                      ? Color.fromARGB(255, 81, 196, 85)
-                      : Color.fromARGB(255, 81, 196, 85),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 8), // Khoảng cách giữa văn bản và Container
-          Text(
-            'Hàng BS Nhật', // Văn bản dưới chân
-            style: TextStyle(
-              color: Color.fromARGB(255, 81, 196, 85),
-              fontSize: 12,
-              fontFamily: 'SFUFUTURABOOK',
-              fontWeight: FontWeight.w600
-            ),
-            
-          ),
-        ],
-      ),
-    ),
-    GestureDetector(
-      onTapDown: _onTapDown1,
-      onTapUp: _onTapUp1,
-      onTapCancel: _onTapCancel1,
-      onTap: () {
-        setState(() {
-          combinedKhachHangMaSoTemp = "NO.1";
-          combinedKhachHangMaSoTemp1 = "";
-        });
-      },
-      child: Column(
-        children: [
-          Transform.scale(
-            scale: _scale,
-            child: Container(
-                 margin: EdgeInsets.only(top: 30),
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: combinedKhachHangMaSoTemp == "NO.1"
-                    ? Color.fromARGB(255, 81, 196, 85)
-                    : Color.fromARGB(255, 255, 255, 255),
-                borderRadius: BorderRadius.circular(10),
-                 border:Border.all(
-                   color: combinedKhachHangMaSoTemp1 == "NO.1"
-                    ? Color.fromARGB(255, 81, 196, 85) // Màu border tùy chỉnh khi điều kiện đúng
-                    : Color.fromARGB(255, 81, 196, 85), // Màu border tùy chỉnh khi điều kiện sai
-                  width: 1,
-                ) 
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                combinedKhachHangMaSoTemp,
-                style: TextStyle(
-                  color: combinedKhachHangMaSoTemp == "NO.1"
-                      ? Color.fromARGB(255, 81, 196, 85)
-                      : Color.fromARGB(255, 81, 196, 85),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 8), // Khoảng cách giữa văn bản và Container
-          Text(
-            'Hàng NO.1', // Văn bản dưới chân
-            style: TextStyle(
-            color: Color.fromARGB(255, 81, 196, 85),
-              fontSize: 12,
-              fontFamily: 'SFUFUTURABOOK',
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    ),
-  ],
-),
-
             SizedBox(height: 20),
           TextFormField(
              style: TextStyle(
@@ -2135,99 +2206,14 @@ class _ThemDoanhThuLamSanScreenState extends State<themdoanhthulamsan> {
     ),
               ),
             ),
-Wrap(
-  alignment: WrapAlignment.center,
-  spacing: 8.0, // Khoảng cách giữa các mục
-  runSpacing: 8.0, // Khoảng cách giữa các dòng
-  children: congDoanLamSanList.map((congDoan) {
-    final tenCongDoan = congDoan['tencongdoan'];
-    final isSelected = selectedOptions.contains(tenCongDoan);
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          if (isSelected) {
-            selectedOptions.remove(tenCongDoan);
-          } else {
-            selectedOptions.add(tenCongDoan);
-          }
-        });
-      },
-      child: Column(
-        children: [
-          Stack(
-            alignment: Alignment.bottomRight,
-            children: [
-              Transform.scale(
-                scale: isSelected ? _scale : _scale1,
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  margin: EdgeInsets.only(top: 15),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? Color.fromARGB(255, 81, 196, 85)
-                        : Color.fromARGB(255, 255, 255, 255),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: Color.fromARGB(255, 81, 196, 85),
-                      width: 1,
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    tenCongDoan,
-                    style: TextStyle(
-                      color: isSelected
-                          ? Color.fromARGB(255, 81, 196, 85)
-                          : Colors.white,
-                      fontSize: 10,
-                    ),
-                  ),
-                ),
-              ),
-              if (isSelected)
-                Container(
-                  width: 16,
-                  height: 16,
-                  margin: EdgeInsets.only(bottom: 2, right: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  alignment: Alignment.center,
-                  child: Icon(
-                    Icons.check,
-                    size: 12,
-                    color: Color.fromARGB(255, 81, 196, 85),
-                  ),
-                ),
-            ],
-          ),
-          SizedBox(height: 8),
-          Text(
-            tenCongDoan,
-            style: TextStyle(
-              color: Color.fromARGB(255, 81, 196, 85),
-              fontSize: 9,
-              fontFamily: 'SFUFUTURABOOK',
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }).toList(),
-),
-
         SizedBox(height: 20),
           TextFormField(
              style: TextStyle(
                 color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
               ),
-              controller: tensanpham,
+              controller: noidung,
               decoration: InputDecoration(
-                labelText: 'Tên sản phẩm',
+                labelText: 'Nội dung',
                   labelStyle: TextStyle(
                     color: Color.fromARGB(255, 81, 196, 85),
                     fontFamily: 'SFUFUTURABOOK',
@@ -2255,60 +2241,24 @@ Wrap(
     ),
               ),
             ),
-                      SizedBox(height: 20),
-          TextFormField(
-            style: TextStyle(
-              color: Color.fromARGB(255, 81, 196, 85), // Màu văn bản khi nhập vào
-            ),
-            controller: soluong,
-            keyboardType: TextInputType.number, // Đặt kiểu bàn phím cho TextInput
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Chỉ cho phép nhập số
-            decoration: InputDecoration(
-              labelText: 'Số lượng',
-              labelStyle: TextStyle(
-                color: Color.fromARGB(255, 81, 196, 85),
-                fontFamily: 'SFUFUTURABOOK',
-                fontWeight: FontWeight.w600,
-              ),
-              suffix: Text('-'),
-              // fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
-              filled: true,
-              fillColor: Colors.white, // Bật chế độ đổ màu nền
-              border: OutlineInputBorder(
-                // Sử dụng OutlineInputBorder để tạo border radius
-                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                borderSide: BorderSide.none, // Ẩn dòng line ở dưới
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
-              ),
-              disabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
-              ),
-            ),
-          ),
 
-             SizedBox(height: 20),
+
+        SizedBox(height: 20),
           TextFormField(
              style: TextStyle(
                 color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
               ),
-              controller: giao,
+              controller: thanhtien,
+                            keyboardType: TextInputType.number, // Đặt kiểu bàn phím cho TextInput
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Chỉ cho phép nhập số
               decoration: InputDecoration(
-                labelText: 'Giao',
+                labelText: 'Thành tiền',
                   labelStyle: TextStyle(
                     color: Color.fromARGB(255, 81, 196, 85),
                     fontFamily: 'SFUFUTURABOOK',
                     fontWeight: FontWeight.w600
                   ),
-                  
-                suffix: Text('-'),
+                
                 //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
                 filled: true,
                  fillColor: Colors.white,  // Bật chế độ đổ màu nền
@@ -2330,42 +2280,8 @@ Wrap(
     ),
               ),
             ),
-             SizedBox(height: 20),
-          TextFormField(
-             style: TextStyle(
-                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
-              ),
-              controller: ve,
-              decoration: InputDecoration(
-                labelText: 'Về',
-                  labelStyle: TextStyle(
-                    color: Color.fromARGB(255, 81, 196, 85),
-                    fontFamily: 'SFUFUTURABOOK',
-                    fontWeight: FontWeight.w600
-                  ),
-                  
-                suffix: Text('-'),
-                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
-                filled: true,
-                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
-                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
-                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
-                ),
-               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
-              ),
-                      focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
-            ),
-              disabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
-    ),
-              ),
-            ),
+
+
             SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -2448,7 +2364,7 @@ class _DoanhThuCongViecState extends State<doanhthucongviec> {
   Future<void> themPhieuDoanhThu() async {
     if (ngayNhapPhieu.text != "") {
       try {
-        String uri = "http://buffquat13.000webhostapp.com/themphieudoanhthu.php";
+        String uri = "http://duongthangne.000webhostapp.com/themphieudoanhthu.php";
         var res = await http.post(Uri.parse(uri), body: {
           "ngaynhapphieu": ngayNhapPhieu.text,
           "uid": widget.userId,
@@ -2482,7 +2398,7 @@ class _DoanhThuCongViecState extends State<doanhthucongviec> {
 
   Future<void> getPhieuDoanhThu() async {
     try {
-      String uri = "http://buffquat13.000webhostapp.com/get_phieudoanhthu.php";
+      String uri = "http://duongthangne.000webhostapp.com/get_phieudoanhthu.php";
       var response = await http.get(Uri.parse(uri));
 
       if (response.statusCode == 200) {
@@ -2504,7 +2420,7 @@ class _DoanhThuCongViecState extends State<doanhthucongviec> {
 
   Future<void> xoaPhieuDoanhThu(String idPhieudoanhthu) async {
     try {
-      String uri = "http://buffquat13.000webhostapp.com/xoaphieudoanhthu.php";
+      String uri = "http://duongthangne.000webhostapp.com/xoaphieudoanhthu.php";
       var res = await http.post(Uri.parse(uri), body: {
         "idPhieudoanhthu": idPhieudoanhthu,
       });
@@ -2750,7 +2666,7 @@ class _chitietphieudoanhthuState extends State<chitietphieudoanhthu> {
 
   Future<void> fetchDataSudungDoanhThu() async {
     try {
-      String uri = "http://buffquat13.000webhostapp.com/get_doanhthu.php";
+      String uri = "http://duongthangne.000webhostapp.com/get_doanhthu.php";
       var response = await http.get(Uri.parse(uri));
 
       if (response.statusCode == 200) {
@@ -2992,7 +2908,7 @@ Future<void> _showEditDialog(BuildContext context, DoanhThuData doanhThu) async 
               };
 
               // Gửi yêu cầu POST đến API
-              String apiUrl = "http://buffquat13.000webhostapp.com/edit_doanhthu.php";
+              String apiUrl = "http://duongthangne.000webhostapp.com/edit_doanhthu.php";
               var response = await http.post(Uri.parse(apiUrl), body: data);
 
               if (response.statusCode == 200) {
@@ -3049,7 +2965,7 @@ Map<String, TextEditingController> noidungndControllers = {};
   
 
   Future<void> fetchData() async {
-    final response = await http.get(Uri.parse('https://buffquat13.000webhostapp.com/congdoanlab.php'));
+    final response = await http.get(Uri.parse('https://duongthangne.000webhostapp.com/congdoanlab.php'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -3153,7 +3069,7 @@ Map<String, TextEditingController> noidungndControllers = {};
           "${khachHangController.text}-${maSoController.text}";
     }
 
-    String uri = "http://buffquat13.000webhostapp.com/doanhthu.php";
+    String uri = "http://duongthangne.000webhostapp.com/doanhthu.php";
    // String soluongValue = soluong.text.isNotEmpty ? soluong.text : "";
 
     // Lấy danh sách các lựa chọn đã chọn thành chuỗi
@@ -3770,7 +3686,7 @@ class _MayMocScreenState extends State<maymoc> {
     if(ngaynhapphieu.text!=""){
       try{
 
-        String uri = "http://buffquat13.000webhostapp.com/themphieumaymoc.php";
+        String uri = "http://duongthangne.000webhostapp.com/themphieumaymoc.php";
 
         var res=await http.post(Uri.parse(uri),body: {
           "ngaynhapphieu":ngaynhapphieu.text,
@@ -3801,7 +3717,7 @@ class _MayMocScreenState extends State<maymoc> {
 
   Future<void> getphieumaymoc() async {
     try {
-      String uri = "http://buffquat13.000webhostapp.com/get_phieumaymoc.php";
+      String uri = "http://duongthangne.000webhostapp.com/get_phieumaymoc.php";
       var response = await http.get(Uri.parse(uri));
 
 
@@ -3909,7 +3825,7 @@ class _chitietphieumaymocState extends State<chitietphieumaymoc> {
 
   Future<void> fetchDataSudungMayMoc() async {
     try {
-      String uri = "http://buffquat13.000webhostapp.com/get_maymoc.php";
+      String uri = "http://duongthangne.000webhostapp.com/get_maymoc.php";
       var response = await http.get(Uri.parse(uri));
 
       if (response.statusCode == 200) {
@@ -4099,7 +4015,7 @@ class _ThemMayMocScreenState extends State<themmaymoc>{
     if(tenmaymoc.text!="" || tinhtrang.text!= "" || tondaungay.text!=""||khachhangmaso.text!="" || soluongsudung.text!= "" || conlaicuoingay.text!=""||tinhtrangcuoingay.text!=""||thoigiannhapphieu.text!=""){
       try{
 
-        String uri = "http://buffquat13.000webhostapp.com/maymoc.php";
+        String uri = "http://duongthangne.000webhostapp.com/maymoc.php";
 
         var res=await http.post(Uri.parse(uri),body: {
           "tenmaymoc":tenmaymoc.text,
@@ -4238,7 +4154,7 @@ class _DungCuScreenState extends State<dungcu> {
     if(ngaynhapphieu.text!=""){
       try{
 
-        String uri = "http://buffquat13.000webhostapp.com/themphieudungcu.php";
+        String uri = "http://duongthangne.000webhostapp.com/themphieudungcu.php";
 
         var res=await http.post(Uri.parse(uri),body: {
           "ngaynhapphieu":ngaynhapphieu.text,
@@ -4269,7 +4185,7 @@ class _DungCuScreenState extends State<dungcu> {
 
   Future<void> getphieudungcu() async {
     try {
-      String uri = "http://buffquat13.000webhostapp.com/get_phieudungcu.php";
+      String uri = "http://duongthangne.000webhostapp.com/get_phieudungcu.php";
       var response = await http.get(Uri.parse(uri));
 
       if (response.statusCode == 200) {
@@ -4378,7 +4294,7 @@ class _chitietphieudungcuState extends State<chitietphieudungcu> {
 
   Future<void> fetchDataSudungDungCu() async {
     try {
-      String uri = "http://buffquat13.000webhostapp.com/get_dungcu.php";
+      String uri = "http://duongthangne.000webhostapp.com/get_dungcu.php";
       var response = await http.get(Uri.parse(uri));
 
       if (response.statusCode == 200) {
@@ -4576,7 +4492,7 @@ class _ThemDungCuScreenState extends State<themdungcu>{
     if(tensanpham.text!="" || tondaungay.text!= "" || soluongsudung.text!=""||conlaicuoingay.text!=""){
       try{
 
-        String uri = "http://buffquat13.000webhostapp.com/dungcu.php";
+        String uri = "http://duongthangne.000webhostapp.com/dungcu.php";
 
         var res=await http.post(Uri.parse(uri),body: {
             "idPhieudungcu": idPhieudungcu,
@@ -4715,7 +4631,7 @@ class _VatLieuScreenState extends State<vatlieu> {
  Future<void> themphieuvatlieu() async {
     if(ngaynhapphieu.text!=""){
       try{
-        String uri = "http://buffquat13.000webhostapp.com/themphieuvatlieu.php";
+        String uri = "http://duongthangne.000webhostapp.com/themphieuvatlieu.php";
         var res=await http.post(Uri.parse(uri),body: {
           "ngaynhapphieu":ngaynhapphieu.text,
           "uid":widget.userId,
@@ -4752,7 +4668,7 @@ class _VatLieuScreenState extends State<vatlieu> {
 
   Future<void> getphieuvatlieu() async {
     try {
-      String uri = "http://buffquat13.000webhostapp.com/get_phieuvatlieu.php";
+      String uri = "http://duongthangne.000webhostapp.com/get_phieuvatlieu.php";
       var response = await http.get(Uri.parse(uri));
 
       if (response.statusCode == 200) {
@@ -4774,7 +4690,7 @@ class _VatLieuScreenState extends State<vatlieu> {
 
   Future<void> xoaPhieuVatLieu(String idPhieuvatlieu) async {
     try {
-      String uri = "http://buffquat13.000webhostapp.com/xoaphieuvatlieu.php";
+      String uri = "http://duongthangne.000webhostapp.com/xoaphieuvatlieu.php";
       var res = await http.post(Uri.parse(uri), body: {
         "idPhieuvatlieu": idPhieuvatlieu,
       });
@@ -5021,7 +4937,7 @@ class _chitietphieuvatlieuState extends State<chitietphieuvatlieu> {
 
   Future<void> fetchDataSudungVatLieu() async {
     try {
-      String uri = "http://buffquat13.000webhostapp.com/get_vatlieu.php";
+      String uri = "http://duongthangne.000webhostapp.com/get_vatlieu.php";
       var response = await http.get(Uri.parse(uri));
 
       if (response.statusCode == 200) {
@@ -5279,7 +5195,7 @@ Future<void> _showEditDialog(BuildContext context, VatLieuData vatlieu) async {
               };
 
               // Gửi yêu cầu POST đến API
-              String apiUrl = "http://buffquat13.000webhostapp.com/edit_vatlieu.php";
+              String apiUrl = "http://duongthangne.000webhostapp.com/edit_vatlieu.php";
               var response = await http.post(Uri.parse(apiUrl), body: data);
 
               if (response.statusCode == 200) {
@@ -5325,45 +5241,67 @@ class _ThemVatLieuScreenState extends State<themvatlieu>{
         TextEditingController khachhangmaso = TextEditingController();
         TextEditingController soluongsudung = TextEditingController();
         TextEditingController conlaicuoingay = TextEditingController();
-       
-     
-   
+
+        TextEditingController donvi = TextEditingController();
+        Map<String, String> donviMap = {};
+
+
+     List<String> tenvatlieuList = [];
+ 
+
+String? selectedValue;
+final TextEditingController textEditingController = TextEditingController();
+
+
 
  @override
   void initState(){
     super.initState();
+    fetchData();
     setNgayNhapPhieu();
+    
   }
+
+  void dispose() {
+  textEditingController.dispose();
+  super.dispose();
+}
+
   void setNgayNhapPhieu(){
      DateTime now = DateTime.now();
     // Gán giá trị ngày tháng năm vào trường ngaynhapphieu
     thoigiannhapphieu.text = "${now.hour}:${now.minute}";
   }
   Future<void> insertrecordvatlieu(String idPhieuvatlieu) async {
+    
     if(tensanpham.text!="" || tondaungay.text!= "" || soluongsudung.text!=""||conlaicuoingay.text!=""||khachhangmaso!=""){
       try{
 
-        String uri = "http://buffquat13.000webhostapp.com/vatlieu.php";
+        String uri = "http://duongthangne.000webhostapp.com/vatlieu.php";
 
         var res=await http.post(Uri.parse(uri),body: {
             "idPhieuvatlieu": idPhieuvatlieu,
             "thoigiannhapphieu":thoigiannhapphieu.text,
-            "tensp":tensanpham.text,
+            "tensp":selectedValue,
+            "donvi":donvi.text,
             "tondaungay":tondaungay.text,
             "khachhangmaso":khachhangmaso.text,
             "soluongsudung":soluongsudung.text,
             "conlaicuoingay":conlaicuoingay.text,    
         });
+        
         var response = jsonDecode(res.body);
         if(response["Success"]=="true"){
           print("Them vật liệu thanh cong!");
-          tensanpham.text="";
-          tondaungay.text="";
-          khachhangmaso.text="";
-          soluongsudung.text="";
-          conlaicuoingay.text="";
+          
+          
+          tondaungay.text= "";
+          khachhangmaso.text= "";
+
+          conlaicuoingay.text= "";
       
          Navigator.pop(context, true);
+    
         }
         else{
           print("Lỗi!");
@@ -5378,8 +5316,96 @@ class _ThemVatLieuScreenState extends State<themvatlieu>{
       print("Lam on dien vao o trong");
     }
   }
+  
+  
+  Future<void> fetchData() async {
+  final response = await http.get(Uri.parse('https://duongthangne.000webhostapp.com/lay_vatlieu_lab.php'));
+  if (response.statusCode == 200) {
+    setState(() {
+      // Dữ liệu về vật liệu và đơn vị
+      final data = (json.decode(response.body) as List<dynamic>);
+      tenvatlieuList = data.map((item) => item['tenvatlieu'].toString()).toList();
+      donviMap = Map.fromIterable(data, key: (item) => item['tenvatlieu'].toString(), value: (item) => item['donvi'].toString());
+      print(tenvatlieuList);
+    });
+  } else {
+    throw Exception('Failed to load data');
+  }
+}
 
- 
+String getDonviForSelectedValue(String selectedValue) {
+  if (donviMap.containsKey(selectedValue)) {
+    return donviMap[selectedValue] ?? ""; // Sử dụng toán tử null-aware để trả về giá trị không null hoặc một chuỗi trống nếu giá trị có thể null.
+  } else {
+    return "Đơn vị không xác định"; // Hoặc giá trị mặc định khác
+  }
+}
+
+
+Future<void> updateStockQuantity(String? vattuId) async {
+  
+  if (vattuId != null) {
+    final soluongText = soluongsudung.text;
+     
+    if (soluongText.isNotEmpty && int.tryParse(soluongText) != null) {
+      final int usedQuantity = int.parse(soluongText);
+      
+      try {
+        // Tìm vật liệu dựa trên vattuId trong cơ sở dữ liệu
+        final response = await http.get(Uri.parse('https://duongthangne.000webhostapp.com/lay_vatlieu_lab.php'));
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body) as List<dynamic>;
+          final vattu = data
+              .firstWhere((item) => item['tenvatlieu'] == vattuId, orElse: () => null);
+              
+          if (vattu != null) {
+            // Lấy số lượng hiện tại trong kho
+            final int currentStockQuantity = int.parse(vattu['soluongtrongkho']);
+            
+            // Kiểm tra xem có đủ số lượng trong kho để sử dụng không
+            if (currentStockQuantity >= usedQuantity) {
+              // Cập nhật số lượng trong kho
+              final newStockQuantity = currentStockQuantity - usedQuantity;
+              print("dữ liệu so luong trong kho: $newStockQuantity");
+              // Gửi yêu cầu cập nhật vào cơ sở dữ liệu
+              final updateResponse = await http.post(
+                Uri.parse('https://duongthangne.000webhostapp.com/update_vatlieu_lab.php'),
+                body: {
+                  'tenvatlieu': vattuId,
+                  'soluongtrongkho': newStockQuantity.toString(),
+                },
+              );
+
+              if (updateResponse.statusCode == 200) {
+                print('Cập nhật số lượng trong kho thành công.');
+              } else {
+                print('Lỗi khi cập nhật số lượng trong kho.');
+              }
+            } else {
+              print('Không đủ số lượng trong kho để sử dụng.');
+            }
+          }
+        } else {
+          print('Lỗi khi tải dữ liệu vật liệu từ cơ sở dữ liệu.');
+        }
+      } catch (e) {
+        print('Lỗiiiii: $e');
+      }
+    } else {
+      print('Giá trị không hợp lệ');
+    }
+  } else {
+    print('ID vật tư không hợp lệ'); // Xử lý trường hợp vattuId là null
+  }
+}
+
+
+
+
+
+
+
   Widget build(BuildContext context) {
     return Scaffold(
       
@@ -5389,21 +5415,106 @@ class _ThemVatLieuScreenState extends State<themvatlieu>{
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
                         SizedBox(height: 20),
-          TextFormField(
+        DropdownButtonHideUnderline(
+        child: DropdownButton2<String>(
+          isExpanded: true,
+          hint: Text(
+            'Chọn vật liệu',
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).hintColor,
+            ),
+            
+          ),
+          
+          items: tenvatlieuList
+    .map((item) => DropdownMenuItem(
+          value: item, // Đảm bảo rằng item có thuộc tính "value" phù hợp với giá trị bạn muốn sử dụng.
+          child: Text(
+            item,
+            style: const TextStyle(
+              fontSize: 14,
+            ),
+          ),
+        ))
+    .toList(),
+          value: selectedValue,
+         onChanged: (value) {
+  setState(() {
+    selectedValue = value;
+    // Tại đây, bạn kiểm tra xem `value` có null hay không
+    if (value != null) {
+      donvi.text = getDonviForSelectedValue(value);
+    }
+  });
+},
+          buttonStyleData: const ButtonStyleData(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            height: 40,
+            width: 200,
+          ),
+          
+          dropdownStyleData: const DropdownStyleData(
+            maxHeight: 200,
+          ),
+          menuItemStyleData: const MenuItemStyleData(
+            height: 40, 
+          ),
+          dropdownSearchData: DropdownSearchData(
+            searchController: textEditingController,
+            searchInnerWidgetHeight: 50,
+            searchInnerWidget: Container(
+              height: 50,
+              padding: const EdgeInsets.only(
+                top: 8,
+                bottom: 4,
+                right: 8,
+                left: 8,
+              ),
+              child: TextFormField(
+                expands: true,
+                maxLines: null,
+                controller: textEditingController,
+                decoration: InputDecoration(
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
+                  hintText: 'Tìm kiếm vật liệu...',
+                  hintStyle: const TextStyle(fontSize: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ),
+            searchMatchFn: (item, searchValue) {
+  final itemValue = item.value.toString().toLowerCase(); // Chuyển item thành chữ thường
+  final searchValueLower = searchValue.toLowerCase(); // Chuyển searchValue thành chữ thường
+  return itemValue.contains(searchValueLower);
+},
+          ),
+          //This to clear the search value when you close the menu
+          onMenuStateChange: (isOpen) {
+            if (!isOpen) {
+              textEditingController.clear();
+            }
+          },
+        ),
+      ),
+      TextFormField(
              style: TextStyle(
                 color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
               ),
-              controller: tensanpham,
+              controller: donvi,
               decoration: InputDecoration(
-                labelText: 'Tên sản phẩm',
+                labelText: 'Đơn vị',
                   labelStyle: TextStyle(
                     color: Color.fromARGB(255, 81, 196, 85),
                     fontFamily: 'SFUFUTURABOOK',
                     fontWeight: FontWeight.w600
                   ),
-                  
-                suffix: Text('-'),
-                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
                 filled: true,
                  fillColor: Colors.white,  // Bật chế độ đổ màu nền
                  border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
@@ -5423,7 +5534,10 @@ class _ThemVatLieuScreenState extends State<themvatlieu>{
                 borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
     ),
               ),
+              enabled: false,
             ),
+
+         
                         SizedBox(height: 20),
           TextFormField(
              style: TextStyle(
@@ -5512,7 +5626,6 @@ class _ThemVatLieuScreenState extends State<themvatlieu>{
                     fontWeight: FontWeight.w600
                   ),
                   
-                suffix: Text('-'),
                 //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
                 filled: true,
                  fillColor: Colors.white,  // Bật chế độ đổ màu nền
@@ -5592,11 +5705,15 @@ class _ThemVatLieuScreenState extends State<themvatlieu>{
                   child: Text("Hủy")
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    insertrecordvatlieu(widget.idPhieuvatlieu);
+                  onPressed: () async { // Đánh dấu hàm là async
+                    await insertrecordvatlieu(widget.idPhieuvatlieu);
+                    if (selectedValue != null) {
+                      await updateStockQuantity(selectedValue);
+                    }
                   },
                   child: Text("Thêm"),
                 ),
+
               ],
             ),
 
@@ -5643,7 +5760,7 @@ class _DangNhapState extends State<DangNhap> {
           showProgressBar = true;
         });
 
-        String uri = "http://buffquat13.000webhostapp.com/login.php";
+        String uri = "http://duongthangne.000webhostapp.com/login.php";
 
         var res = await http.post(Uri.parse(uri), body: {
           "email": email.text,
@@ -6008,7 +6125,7 @@ Future<void> startWorkTime() async {
         isEndButtonDisabled = true;
       });
 
-      String uri = "http://buffquat13.000webhostapp.com/themngaylamviec.php";
+      String uri = "http://duongthangne.000webhostapp.com/themngaylamviec.php";
       var res = await http.post(Uri.parse(uri), body: {
         "ngaylamviec": Ngaylamviec,
         "thoigianbatdau": Batdaulamviec,
