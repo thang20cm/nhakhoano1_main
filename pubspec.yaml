@@ -31,11 +31,8 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.3
-  fluttertoast: ^8.0.7
   shared_preferences: ^2.0.0
-
-  
-    
+  dropdown_button2: ^2.3.9
   
 
     
@@ -45,6 +42,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_core: ^2.15.1
   firebase_messaging: ^14.6.7
+  searchfield: ^0.8.6
 
 
 dev_dependencies:
