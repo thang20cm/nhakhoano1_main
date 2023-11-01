@@ -711,7 +711,6 @@ class VatLieuLamSanData {
   String Thoigiannhapphieu;
   String Tensanpham;
   String Tondaungay;
-  String Khachhangmaso;
   String Soluongsudung;
  String Conlaicuoingay;
  String idChitietphieuvatlieu;
@@ -721,7 +720,6 @@ class VatLieuLamSanData {
     required this.Thoigiannhapphieu,
     required this.Tensanpham,
     required this.Tondaungay,
-    required this.Khachhangmaso,
     required this.Soluongsudung,
     required this.Conlaicuoingay,
     required this.idChitietphieuvatlieu,
@@ -742,34 +740,33 @@ class chitietphieuvatlieulamsan extends StatefulWidget {
 
 class _chitietphieuvatlieulamsanState extends State<chitietphieuvatlieulamsan> {
 
-  List<VatLieuLamSanData> danhSachVatLieu = [];
+  List<VatLieuLamSanData> danhSachVatLieuLamSan = [];
 
   @override
   void initState(){
     super.initState();
-    fetchDataSudungVatLieu();
+    fetchDataSudungVatLieuLamSan();
   }
 
-  Future<void> fetchDataSudungVatLieu() async {
+  Future<void> fetchDataSudungVatLieuLamSan() async {
     try {
       String uri = "http://duongthangne.000webhostapp.com/get_vatlieu_lamsan.php";
       var response = await http.get(Uri.parse(uri));
 
       if (response.statusCode == 200) {
         List<dynamic> data = jsonDecode(response.body);
-        List<VatLieuLamSanData> vatLieuList = data.map((item) => VatLieuLamSanData(
+        List<VatLieuLamSanData> vatLieuListLamSan = data.map((item) => VatLieuLamSanData(
               idChitietphieuvatlieu: item['idVatlieu'],
               idphieuvatlieuu: item['idPhieuvatlieu'],
               Thoigiannhapphieu: item['Thoigiannhapphieu'],
               Tensanpham: item['Tensp'],
               Tondaungay: item['Tondaungay'],
-              Khachhangmaso: item['KhachangMaso'],
               Soluongsudung: item['Soluongsudung'],
               Conlaicuoingay: item['Conlaicuoingay'], 
             )).toList();
 
         setState(() {
-          danhSachVatLieu = vatLieuList.where((vatlieu) => vatlieu.idphieuvatlieuu == widget.idPhieuvatlieu).toList();
+          danhSachVatLieuLamSan = vatLieuListLamSan.where((vatlieulamsan) => vatlieulamsan.idphieuvatlieuu == widget.idPhieuvatlieu).toList();
         });
       } else {
         print("Lỗi khi lấy dữ liệu từ bảng sudungvatlieu: ${response.statusCode}");
@@ -782,7 +779,9 @@ class _chitietphieuvatlieulamsanState extends State<chitietphieuvatlieulamsan> {
 @override
 Widget build(BuildContext context) {
   double screenWidth = MediaQuery.of(context).size.width;
-  double columnWidthPercentage = screenWidth * 0.1428; // Ví dụ: mỗi cột chiếm 25% màn hình
+  double columnWidthPercentage1 = screenWidth * 0.45; // Ví dụ: mỗi cột chiếm 25% màn hình
+  double columnWidthPercentage2 = screenWidth * 0.30;
+  double columnWidthPercentage3 = screenWidth * 0.25;
 
   return Scaffold(
     appBar: AppBar(
@@ -802,28 +801,14 @@ Widget build(BuildContext context) {
             Table(
               border: TableBorder.all(), // Đường viền cho bảng
               columnWidths: {
-                0: FixedColumnWidth(columnWidthPercentage), // Độ rộng cột 0
-                1: FixedColumnWidth(columnWidthPercentage), // Độ rộng cột 1
-                2: FixedColumnWidth(columnWidthPercentage), // Độ rộng cột 2
-                3: FixedColumnWidth(columnWidthPercentage),
-                4: FixedColumnWidth(columnWidthPercentage), 
-                5: FixedColumnWidth(columnWidthPercentage), // Độ rộng cột 3
-                6: FixedColumnWidth(columnWidthPercentage), 
+                0: FixedColumnWidth(columnWidthPercentage1), // Độ rộng cột 0
+                1: FixedColumnWidth(columnWidthPercentage2), // Độ rộng cột 1
+                2: FixedColumnWidth(columnWidthPercentage3), // Độ rộng cột 2
               },
               defaultVerticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
               children: [
                 TableRow(
                   children: [
-                    TableCell(
-                      child: Container(
-                        padding: EdgeInsets.all(8),
-                        // Màu nền
-                        child: Text(
-                          'Thời gian',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
                     TableCell(
                       child: Container(
                         padding: EdgeInsets.all(8),
@@ -834,42 +819,12 @@ Widget build(BuildContext context) {
                         ),
                       ),
                     ),
-                    TableCell(
-                      child: Container(
-                        padding: EdgeInsets.all(8),
-                       // Màu nền
-                        child: Text(
-                          'Tồn đầu ngày',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                     TableCell(
-                      child: Container(
-                        padding: EdgeInsets.all(8),
-                     // Màu nền
-                        child: Text(
-                          'Khách hàng - Mã số',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                     TableCell(
-                      child: Container(
-                        padding: EdgeInsets.all(8),
-                        // Màu nền
-                        child: Text(
-                          'Số lượng sử dụng',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
                        TableCell(
                       child: Container(
                         padding: EdgeInsets.all(8),
                         // Màu nền
                         child: Text(
-                          'Còn lại cuối ngày',
+                          'Số lượng sử dụng',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -887,16 +842,10 @@ Widget build(BuildContext context) {
                   ],
                 ),
                 // Thêm các hàng dữ liệu tương tự như dưới đây
-                for (var item in danhSachVatLieu)
+                for (var item in danhSachVatLieuLamSan)
                   TableRow(
                     children: [
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding tùy chỉnh
-                          child: Text(item.Thoigiannhapphieu),
-                        ),
-                      ),
+                      
                       TableCell(
                         verticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
                         child: Container(
@@ -908,30 +857,10 @@ Widget build(BuildContext context) {
                         verticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding tùy chỉnh
-                          child: Text(item.Tondaungay),
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding tùy chỉnh
-                          child: Text(item.Khachhangmaso),
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding tùy chỉnh
                           child: Text(item.Soluongsudung),
                         ),
                       ),
-                        TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding tùy chỉnh
-                          child: Text(item.Conlaicuoingay),
-                        ),
-                      ),
+
                        TableCell(
                             verticalAlignment: TableCellVerticalAlignment.middle,
                             child: Container(
@@ -939,7 +868,7 @@ Widget build(BuildContext context) {
                               child: IconButton(
                                 icon: Icon(Icons.edit), // Sử dụng biểu tượng chỉnh sửa
                                 onPressed: () {
-                                  _showEditDialog(context, item);
+                                  _showEditDialogLamSan(context, item);
                                 },
                               ),
                             ),
@@ -959,12 +888,12 @@ Widget build(BuildContext context) {
           context,
           MaterialPageRoute(
             builder: (context) => themvatlieulamsan(
-              idPhieuvatlieulamsan: widget.idPhieuvatlieu,
+              idPhieuvatlieu: widget.idPhieuvatlieu,
             ),
           ),
         );
         if (success == true) {
-          fetchDataSudungVatLieu();
+          fetchDataSudungVatLieuLamSan();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Thêm thành công!'),
@@ -980,11 +909,11 @@ Widget build(BuildContext context) {
   );
   
 }
-Future<void> _showEditDialog(BuildContext context, VatLieuLamSanData vatlieu) async {
+Future<void> _showEditDialogLamSan(BuildContext context, VatLieuLamSanData vatlieu) async {
   TextEditingController _thoiGianController = TextEditingController(text: vatlieu.Thoigiannhapphieu);
   TextEditingController _tenSPController = TextEditingController(text: vatlieu.Tensanpham);
   TextEditingController _tonDauNgayController = TextEditingController(text: vatlieu.Tondaungay);
-  TextEditingController _KHMSController = TextEditingController(text: vatlieu.Khachhangmaso);
+ 
   TextEditingController _soLuongSDController = TextEditingController(text: vatlieu.Soluongsudung);
   TextEditingController _conLaiController = TextEditingController(text: vatlieu.Conlaicuoingay);
 
@@ -1008,12 +937,9 @@ Future<void> _showEditDialog(BuildContext context, VatLieuLamSanData vatlieu) as
               ),
               TextFormField(
                 controller: _tonDauNgayController,
-                decoration: InputDecoration(labelText: 'Tồn đầu ngày'),
+                decoration: InputDecoration(labelText: 'Nhận trong ngày'),
               ),
-              TextFormField(
-                controller: _KHMSController,
-                decoration: InputDecoration(labelText: 'Khách hàng - Mã số'),
-              ),
+              
                TextFormField(
                 controller: _soLuongSDController,
                 keyboardType: TextInputType.number, // Đặt kiểu bàn phím cho TextInput
@@ -1041,7 +967,6 @@ Future<void> _showEditDialog(BuildContext context, VatLieuLamSanData vatlieu) as
               String thoiGianMoi = _thoiGianController.text;
               String tenSPMoi = _tenSPController.text;
               String tonDauNgayMoi = _tonDauNgayController.text;
-              String KHMSMoi = _KHMSController.text;
               String soLuongSDMoi = _soLuongSDController.text;
               String conlaiMoi = _conLaiController.text;
             
@@ -1052,7 +977,6 @@ Future<void> _showEditDialog(BuildContext context, VatLieuLamSanData vatlieu) as
                 'thoiGian': thoiGianMoi,
                 'tenSP': tenSPMoi,
                 'tondaungay': tonDauNgayMoi,
-                'KHMS': KHMSMoi,
                 'soLuong': soLuongSDMoi,
                 'conlai': conlaiMoi,
               };
@@ -1067,7 +991,7 @@ Future<void> _showEditDialog(BuildContext context, VatLieuLamSanData vatlieu) as
                 // Đóng hộp thoại chỉnh sửa
                 Navigator.of(context).pop();
                 // Cập nhật lại danh sách chi tiết phiếu doanh thu
-                fetchDataSudungVatLieu();
+                fetchDataSudungVatLieuLamSan();
               } else {
                 print("Lỗi khi cập nhật dữ liệu: ${response.statusCode}");
               }
@@ -1081,10 +1005,15 @@ Future<void> _showEditDialog(BuildContext context, VatLieuLamSanData vatlieu) as
 }
 }
 
+
+
+
+
+
 class themvatlieulamsan extends StatefulWidget {
  
- final String idPhieuvatlieulamsan;
-  themvatlieulamsan({required this.idPhieuvatlieulamsan});
+ final String idPhieuvatlieu;
+  themvatlieulamsan({required this.idPhieuvatlieu});
   
   @override
   _ThemVatLieuLamSanScreenState createState() => _ThemVatLieuLamSanScreenState();
@@ -1096,25 +1025,42 @@ class _ThemVatLieuLamSanScreenState extends State<themvatlieulamsan>{
         TextEditingController thoigiannhapphieu = TextEditingController();
         TextEditingController tensanpham = TextEditingController();
         TextEditingController tondaungay = TextEditingController();
-        TextEditingController khachhangmaso = TextEditingController();
         TextEditingController soluongsudung = TextEditingController();
         TextEditingController conlaicuoingay = TextEditingController();
-       
-     
-   
+
+        TextEditingController donvi = TextEditingController();
+        Map<String, String> donviMap = {};
+
+
+     List<String> tenvatlieuList = [];
+ 
+
+String? selectedValue;
+final TextEditingController textEditingController = TextEditingController();
+
+
 
  @override
   void initState(){
     super.initState();
+    fetchDataLamSan();
     setNgayNhapPhieu();
+    
   }
+
+  void dispose() {
+  textEditingController.dispose();
+  super.dispose();
+}
+
   void setNgayNhapPhieu(){
      DateTime now = DateTime.now();
     // Gán giá trị ngày tháng năm vào trường ngaynhapphieu
     thoigiannhapphieu.text = "${now.hour}:${now.minute}";
   }
-  Future<void> insertrecordvatlieu(String idPhieuvatlieu) async {
-    if(tensanpham.text!="" || tondaungay.text!= "" || soluongsudung.text!=""||conlaicuoingay.text!=""||khachhangmaso!=""){
+  Future<void> insertrecordvatlieulamsan(String idPhieuvatlieu) async {
+    
+    if(tensanpham.text!="" || tondaungay.text!= "" || soluongsudung.text!=""||conlaicuoingay.text!=""){
       try{
 
         String uri = "http://duongthangne.000webhostapp.com/vatlieulamsan.php";
@@ -1122,22 +1068,24 @@ class _ThemVatLieuLamSanScreenState extends State<themvatlieulamsan>{
         var res=await http.post(Uri.parse(uri),body: {
             "idPhieuvatlieu": idPhieuvatlieu,
             "thoigiannhapphieu":thoigiannhapphieu.text,
-            "tensp":tensanpham.text,
+            "tensp":selectedValue,
+            "donvi":donvi.text,
             "tondaungay":tondaungay.text,
-            "khachhangmaso":khachhangmaso.text,
             "soluongsudung":soluongsudung.text,
             "conlaicuoingay":conlaicuoingay.text,    
         });
+        
         var response = jsonDecode(res.body);
         if(response["Success"]=="true"){
           print("Them vật liệu thanh cong!");
-          tensanpham.text="";
-          tondaungay.text="";
-          khachhangmaso.text="";
-          soluongsudung.text="";
-          conlaicuoingay.text="";
+          
+          
+          tondaungay.text= "";
+
+          conlaicuoingay.text= "";
       
          Navigator.pop(context, true);
+    
         }
         else{
           print("Lỗi!");
@@ -1152,8 +1100,106 @@ class _ThemVatLieuLamSanScreenState extends State<themvatlieulamsan>{
       print("Lam on dien vao o trong");
     }
   }
+  
+  
+  Future<void> fetchDataLamSan() async {
+  final response = await http.get(Uri.parse('https://duongthangne.000webhostapp.com/lay_vatlieu_lamsan.php'));
+  if (response.statusCode == 200) {
+    setState(() {
+      // Dữ liệu về vật liệu và đơn vị
+      final data = (json.decode(response.body) as List<dynamic>);
+      tenvatlieuList = data.map((item) => item['tenvatlieu'].toString()).toList();
+      donviMap = Map.fromIterable(data, key: (item) => item['tenvatlieu'].toString(), value: (item) => item['donvi'].toString());
+      print("Hello");
+    });
+  } else {
+    throw Exception('Failed to load data');
+  }
+}
 
- 
+String getDonviForSelectedValue(String selectedValue) {
+  if (donviMap.containsKey(selectedValue)) {
+    return donviMap[selectedValue] ?? ""; // Sử dụng toán tử null-aware để trả về giá trị không null hoặc một chuỗi trống nếu giá trị có thể null.
+  } else {
+    return "Đơn vị không xác định"; // Hoặc giá trị mặc định khác
+  }
+}
+
+void updateUsedQuantity() {
+  if (tondaungay.text.isNotEmpty && conlaicuoingay.text.isNotEmpty) {
+    int tonDauNgay = int.parse(tondaungay.text);
+    int conLaiCuoiNgay = int.parse(conlaicuoingay.text);
+    int usedQuantity = tonDauNgay - conLaiCuoiNgay;
+    soluongsudung.text = usedQuantity.toString();
+  }
+}
+
+
+
+Future<void> updateStockQuantityLamSan(String? vattuId) async {
+  
+  if (vattuId != null) {
+    final soluongText = soluongsudung.text;
+     
+    if (soluongText.isNotEmpty && int.tryParse(soluongText) != null) {
+      final int usedQuantity = int.parse(soluongText);
+      
+      try {
+        // Tìm vật liệu dựa trên vattuId trong cơ sở dữ liệu
+        final response = await http.get(Uri.parse('https://duongthangne.000webhostapp.com/lay_vatlieu_lamsan.php'));
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body) as List<dynamic>;
+          final vattu = data
+              .firstWhere((item) => item['tenvatlieu'] == vattuId, orElse: () => null);
+              
+          if (vattu != null) {
+            // Lấy số lượng hiện tại trong kho
+            final int currentStockQuantity = int.parse(vattu['soluongtrongkho']);
+            
+            // Kiểm tra xem có đủ số lượng trong kho để sử dụng không
+            if (currentStockQuantity >= usedQuantity) {
+              // Cập nhật số lượng trong kho
+              final newStockQuantity = currentStockQuantity - usedQuantity;
+              print("dữ liệu so luong trong kho: $newStockQuantity");
+              // Gửi yêu cầu cập nhật vào cơ sở dữ liệu
+              final updateResponse = await http.post(
+                Uri.parse('https://duongthangne.000webhostapp.com/update_vatlieu_lamsan.php'),
+                body: {
+                  'tenvatlieu': vattuId,
+                  'soluongtrongkho': newStockQuantity.toString(),
+                },
+              );
+
+              if (updateResponse.statusCode == 200) {
+                print('Cập nhật số lượng trong kho thành công.');
+              } else {
+                print('Lỗi khi cập nhật số lượng trong kho.');
+              }
+            } else {
+              print('Không đủ số lượng trong kho để sử dụng.');
+            }
+          }
+        } else {
+          print('Lỗi khi tải dữ liệu vật liệu từ cơ sở dữ liệu.');
+        }
+      } catch (e) {
+        print('Lỗiiiii: $e');
+      }
+    } else {
+      print('Giá trị không hợp lệ');
+    }
+  } else {
+    print('ID vật tư không hợp lệ'); // Xử lý trường hợp vattuId là null
+  }
+}
+
+
+
+
+
+
+
   Widget build(BuildContext context) {
     return Scaffold(
       
@@ -1163,47 +1209,115 @@ class _ThemVatLieuLamSanScreenState extends State<themvatlieulamsan>{
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
                         SizedBox(height: 20),
-          TextFormField(
-             style: TextStyle(
-                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
-              ),
-              controller: tensanpham,
-              decoration: InputDecoration(
-                labelText: 'Tên sản phẩm',
-                  labelStyle: TextStyle(
-                    color: Color.fromARGB(255, 81, 196, 85),
-                    fontFamily: 'SFUFUTURABOOK',
-                    fontWeight: FontWeight.w600
-                  ),
-                  
-                suffix: Text('-'),
-                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
-                filled: true,
-                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
-                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
-                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
-                ),
-               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
-              ),
-                      focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
-            ),
-              disabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+    DropdownButtonHideUnderline(
+  child: Container(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(8),
+      border: Border.all(
+        color: Color.fromARGB(255, 81, 196, 85), // Border color
+      ),
     ),
+    child: DropdownButton2<String>(
+      isExpanded: true,
+      hint: Text(
+        'Chọn vật liệu',
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.purple, // Text color
+          fontWeight: FontWeight.bold, // Text style - bold
+        ),
+      ),
+      items: tenvatlieuList
+          .map((item) => DropdownMenuItem(
+                value: item,
+                child: Text(
+                  item,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.purple, // Text color
+                    fontWeight: FontWeight.bold, // Text style - bold
+                  ),
+                ),
+              ))
+          .toList(),
+      value: selectedValue,
+      onChanged: (value) {
+        setState(() {
+          selectedValue = value;
+          if (value != null) {
+            donvi.text = getDonviForSelectedValue(value);
+          }
+        });
+      },
+      buttonStyleData: const ButtonStyleData(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        height: 40,
+        width: 200,
+      ),
+      dropdownStyleData: const DropdownStyleData(
+        maxHeight: 200,
+      ),
+      menuItemStyleData: const MenuItemStyleData(
+        height: 40,
+      ),
+      dropdownSearchData: DropdownSearchData(
+        searchController: textEditingController,
+        searchInnerWidgetHeight: 50,
+        searchInnerWidget: Container(
+          height: 50,
+          padding: const EdgeInsets.only(
+            top: 8,
+            bottom: 4,
+            right: 8,
+            left: 8,
+          ),
+          child: TextFormField(
+            expands: true,
+            maxLines: null,
+            controller: textEditingController,
+            decoration: InputDecoration(
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 8,
+              ),
+              hintText: 'Tìm kiếm vật liệu...',
+              hintStyle: TextStyle(
+                fontSize: 12,
+                color: Colors.purple, // Text color
+                fontWeight: FontWeight.bold, // Text style - bold
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: Color.fromARGB(255, 81, 196, 85), // Border color
+                ),
               ),
             ),
+          ),
+        ),
+        searchMatchFn: (item, searchValue) {
+          final itemValue = item.value.toString().toLowerCase();
+          final searchValueLower = searchValue.toLowerCase();
+          return itemValue.contains(searchValueLower);
+        },
+      ),
+      onMenuStateChange: (isOpen) {
+        if (!isOpen) {
+          textEditingController.clear();
+        }
+      },
+    ),
+  ),
+),       
                         SizedBox(height: 20),
           TextFormField(
              style: TextStyle(
                 color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
               ),
               controller: tondaungay,
+              keyboardType: TextInputType.number, // Đặt kiểu bàn phím cho TextInput
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Chỉ cho phép nhập số
               decoration: InputDecoration(
                 labelText: 'Nhận trong ngày',
                   labelStyle: TextStyle(
@@ -1212,7 +1326,6 @@ class _ThemVatLieuLamSanScreenState extends State<themvatlieulamsan>{
                     fontWeight: FontWeight.w600
                   ),
                   
-                suffix: Text('-'),
                 //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
                 filled: true,
                  fillColor: Colors.white,  // Bật chế độ đổ màu nền
@@ -1233,22 +1346,27 @@ class _ThemVatLieuLamSanScreenState extends State<themvatlieulamsan>{
                 borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
     ),
               ),
+              onChanged: (value) {
+                updateUsedQuantity();
+              },
             ),
                          SizedBox(height: 20),
+                          
           TextFormField(
              style: TextStyle(
                 color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
               ),
-              controller: khachhangmaso,
+              controller: conlaicuoingay,
+              keyboardType: TextInputType.number, // Đặt kiểu bàn phím cho TextInput
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Chỉ cho phép nhập số
               decoration: InputDecoration(
-                labelText: 'Khách hàng - Mã số',
+                labelText: 'Còn lại cuối ngày',
                   labelStyle: TextStyle(
                     color: Color.fromARGB(255, 81, 196, 85),
                     fontFamily: 'SFUFUTURABOOK',
                     fontWeight: FontWeight.w600
                   ),
                   
-                suffix: Text('-'),
                 //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
                 filled: true,
                  fillColor: Colors.white,  // Bật chế độ đổ màu nền
@@ -1269,8 +1387,11 @@ class _ThemVatLieuLamSanScreenState extends State<themvatlieulamsan>{
                 borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
     ),
               ),
+               onChanged: (value) {
+                updateUsedQuantity();
+              },
             ),
-                        SizedBox(height: 20),
+        SizedBox(height: 20),
           TextFormField(
              style: TextStyle(
                 color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
@@ -1286,7 +1407,6 @@ class _ThemVatLieuLamSanScreenState extends State<themvatlieulamsan>{
                     fontWeight: FontWeight.w600
                   ),
                   
-                suffix: Text('-'),
                 //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
                 filled: true,
                  fillColor: Colors.white,  // Bật chế độ đổ màu nền
@@ -1308,48 +1428,8 @@ class _ThemVatLieuLamSanScreenState extends State<themvatlieulamsan>{
     ),
               ),
             ),
-                         SizedBox(height: 20),
-          TextFormField(
-             style: TextStyle(
-                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
-              ),
-              controller: conlaicuoingay,
-              decoration: InputDecoration(
-                labelText: 'Còn lại cuối ngày',
-                  labelStyle: TextStyle(
-                    color: Color.fromARGB(255, 81, 196, 85),
-                    fontFamily: 'SFUFUTURABOOK',
-                    fontWeight: FontWeight.w600
-                  ),
-                  
-                suffix: Text('-'),
-                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
-                filled: true,
-                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
-                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
-                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
-                ),
-               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
-              ),
-                      focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
-            ),
-              disabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
-    ),
-              ),
-            ),
-          
-            // TextFormField(
-            //   controller: ngaynhapphieu,
-            //   decoration: InputDecoration(labelText: 'Ngay nhap phieu'),
-            //   enabled: false,
-            // ),
+                        
+
            SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -1366,11 +1446,15 @@ class _ThemVatLieuLamSanScreenState extends State<themvatlieulamsan>{
                   child: Text("Hủy")
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    insertrecordvatlieu(widget.idPhieuvatlieulamsan);
+                  onPressed: () async { // Đánh dấu hàm là async
+                    await insertrecordvatlieulamsan(widget.idPhieuvatlieu);
+                    if (selectedValue != null) {
+                      await updateStockQuantityLamSan(selectedValue);
+                    }
                   },
                   child: Text("Thêm"),
                 ),
+
               ],
             ),
 
@@ -1698,6 +1782,7 @@ class DoanhThuDataLamSan {
   String Thanhtien;
   String idChitietphieudoanhthu;
   String idphieudoanhthuu;
+  bool isMatch;
 
   DoanhThuDataLamSan({
     required this.Thoigiannhanviec,
@@ -1706,6 +1791,23 @@ class DoanhThuDataLamSan {
     required this.Thanhtien,
     required this.idChitietphieudoanhthu,
     required this.idphieudoanhthuu,
+    this.isMatch = false,
+  });
+}
+
+class NhatKyDataLamSan {
+  String Ngaynhatky;
+  String Tenbenhnhan;
+  String Noidungnhatky;
+  String Thanhtoan;
+
+
+  NhatKyDataLamSan({
+    required this.Ngaynhatky,
+    required this.Tenbenhnhan,
+    required this.Noidungnhatky,
+    required this.Thanhtoan,
+
   });
 }
 
@@ -1721,6 +1823,8 @@ class chitietphieudoanhthulamsan extends StatefulWidget {
 
 class _chitietphieudoanhthulamsanState extends State<chitietphieudoanhthulamsan> {
   List<DoanhThuDataLamSan> danhSachDoanhThuLamSan = [];
+   List<Color> rowColors = [];
+  
 
   @override
   void initState() {
@@ -1728,7 +1832,9 @@ class _chitietphieudoanhthulamsanState extends State<chitietphieudoanhthulamsan>
     fetchDataSudungDoanhThu();
   }
 
-  Future<void> fetchDataSudungDoanhThu() async {
+  
+
+ Future<void> fetchDataSudungDoanhThu() async {
     try {
       String uri = "http://duongthangne.000webhostapp.com/get_doanhthulamsan.php";
       var response = await http.get(Uri.parse(uri));
@@ -1744,9 +1850,52 @@ class _chitietphieudoanhthulamsanState extends State<chitietphieudoanhthulamsan>
               Thanhtien: item['ThanhTien'],
             )).toList();
 
+        List<Color> initialRowColors = List.filled(doanhThuLamSanList.length, Colors.green);
+
         setState(() {
           danhSachDoanhThuLamSan = doanhThuLamSanList.where((doanhThu) => doanhThu.idphieudoanhthuu == widget.idPhieudoanhthu).toList();
+          rowColors = initialRowColors;
         });
+
+        // Load màu từ fetchDataNhatKyHangNgay và cập nhật danh sách màu
+        fetchDataNhatKyHangNgay();
+      } else {
+        print("Lỗi khi lấy dữ liệu từ bảng sudungmaymoc: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Lỗi khi lấy dữ liệu từ bảng sudungmaymoc: $e");
+    }
+  }
+
+  Future<void> fetchDataNhatKyHangNgay() async {
+    try {
+      String uri = "http://duongthangne.000webhostapp.com/get_nhatkyhangngay.php";
+      var response = await http.get(Uri.parse(uri));
+
+      if (response.statusCode == 200) {
+        List<dynamic> datanhatky = jsonDecode(response.body);
+        List<NhatKyDataLamSan> nhatKyLamSanList = datanhatky.map((item) => NhatKyDataLamSan(
+          Ngaynhatky: item['ngaynhatky'],
+          Tenbenhnhan: item['tenbenhnhan'],
+          Noidungnhatky: item['noidung'],
+          Thanhtoan: item['thanhtoan'],
+        )).toList();
+
+        for (int i = 0; i < danhSachDoanhThuLamSan.length; i++) {
+          bool isMatch = false;
+          for (var nhatKy in nhatKyLamSanList) {
+            if (
+              danhSachDoanhThuLamSan[i].Khachhangmaso == nhatKy.Tenbenhnhan &&
+                danhSachDoanhThuLamSan[i].Noidung == nhatKy.Noidungnhatky &&
+                danhSachDoanhThuLamSan[i].Thanhtien == nhatKy.Thanhtoan) {
+              isMatch = true;
+              break;
+            }
+          }
+          setState(() {
+            rowColors[i] = isMatch ? Colors.green : Colors.transparent;
+          });
+        }
       } else {
         print("Lỗi khi lấy dữ liệu từ bảng sudungmaymoc: ${response.statusCode}");
       }
@@ -1758,11 +1907,11 @@ class _chitietphieudoanhthulamsanState extends State<chitietphieudoanhthulamsan>
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double columnWidthPercentage1 = screenWidth * 0.2;
+    double columnWidthPercentage1 = screenWidth * 0.25;
     double columnWidthPercentage2 = screenWidth * 0.3;
-    double columnWidthPercentage3 = screenWidth * 0.3;
+    double columnWidthPercentage3 = screenWidth * 0.25;
     double columnWidthPercentage4 = screenWidth * 0.2;
-   
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -1789,12 +1938,11 @@ class _chitietphieudoanhthulamsanState extends State<chitietphieudoanhthulamsan>
                   children: [
                     TableRow(
                       children: [
-                   
                         TableCell(
                           child: Container(
                             padding: EdgeInsets.all(8),
                             child: Text(
-                              'Khách hàng - Mã số',
+                              'Khách hàng',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -1828,50 +1976,51 @@ class _chitietphieudoanhthulamsanState extends State<chitietphieudoanhthulamsan>
                         ),
                       ],
                     ),
-                    for (var item in danhSachDoanhThuLamSan)
+                    for (int i = 0; i < danhSachDoanhThuLamSan.length; i++)
                       TableRow(
                         children: [
                           TableCell(
-                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            verticalAlignment: TableCellVerticalAlignment.fill, 
                             child: Container(
                               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                              child: Text(item.Khachhangmaso),
+                              color: rowColors[i],
+                              child: Text(danhSachDoanhThuLamSan[i].Khachhangmaso),
                             ),
                           ),
                           TableCell(
-                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            verticalAlignment: TableCellVerticalAlignment.fill, 
                             child: Container(
                               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                              child: Text(item.Noidung),
+                              color: rowColors[i],
+                              child: Text(danhSachDoanhThuLamSan[i].Noidung),
                             ),
                           ),
                           TableCell(
-                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            verticalAlignment: TableCellVerticalAlignment.fill, 
                             child: Container(
                               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              color: rowColors[i],
                               child: Text(
-                                item.Thanhtien.toString().replaceAllMapped(
+                                danhSachDoanhThuLamSan[i].Thanhtien.toString().replaceAllMapped(
                                   RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
                                   (Match match) => '${match[1]}.',
                                 ),
                               ),
                             ),
                           ),
-
-                      
                           TableCell(
-                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            verticalAlignment: TableCellVerticalAlignment.middle, 
                             child: Container(
                               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              color: rowColors[i],
                               child: IconButton(
-                                icon: Icon(Icons.edit), // Sử dụng biểu tượng chỉnh sửa
+                                icon: Icon(Icons.edit),
                                 onPressed: () {
-                                  _showEditDialog(context, item);
+                                  _showEditDialog(context, danhSachDoanhThuLamSan[i]);
                                 },
                               ),
                             ),
                           ),
-
                         ],
                       ),
                   ],
@@ -1908,6 +2057,10 @@ class _chitietphieudoanhthulamsanState extends State<chitietphieudoanhthulamsan>
     );
   }
 
+
+  
+
+
 Future<void> _showEditDialog(BuildContext context, DoanhThuDataLamSan doanhThu) async {
   TextEditingController _khachHangController = TextEditingController(text: doanhThu.Khachhangmaso);
   TextEditingController _noiDungController = TextEditingController(text: doanhThu.Noidung);
@@ -1923,7 +2076,7 @@ Future<void> _showEditDialog(BuildContext context, DoanhThuDataLamSan doanhThu) 
             children: [
               TextFormField(
                 controller: _khachHangController,
-                decoration: InputDecoration(labelText: 'Khách hàng - Mã số'),
+                decoration: InputDecoration(labelText: 'Khách hàng'),
               ),
               TextFormField(
                 controller: _noiDungController,
@@ -1995,7 +2148,6 @@ class themdoanhthulamsan extends StatefulWidget {
 
 class _ThemDoanhThuLamSanScreenState extends State<themdoanhthulamsan> {
   TextEditingController khachHangController = TextEditingController();
-  TextEditingController maSoController = TextEditingController();
   TextEditingController noidung = TextEditingController();
   TextEditingController thanhtien = TextEditingController();
 
@@ -2075,22 +2227,14 @@ class _ThemDoanhThuLamSanScreenState extends State<themdoanhthulamsan> {
 
   Future<void> insertRecordDoanhThuLamSan(String idPhieudoanhthu) async {
   
-      try {
-        String combinedKhachHangMaSo = "";
-        if (combinedKhachHangMaSoTemp.isNotEmpty) {
-          combinedKhachHangMaSo =
-              "$combinedKhachHangMaSoTemp-${khachHangController.text}-${maSoController.text}";
-        } else {
-          combinedKhachHangMaSo =
-              "${khachHangController.text}-${maSoController.text}";
-        }
+     
 
         String uri = "http://duongthangne.000webhostapp.com/doanhthulamsan.php";
 
         var res = await http.post(Uri.parse(uri), body: {
           "idPhieudoanhthu": idPhieudoanhthu,
           "thoigiannhanviec": thoigiannhanviec.text,
-          "khachhangmaso": combinedKhachHangMaSo,
+          "khachhangmaso": khachHangController.text,
           "noidung": noidung.text,
           "thanhtien": thanhtien.text,
         });
@@ -2100,7 +2244,6 @@ class _ThemDoanhThuLamSanScreenState extends State<themdoanhthulamsan> {
         if (response["Success"] == "true") {
           print("Thêm doanh thu thành công!");
           khachHangController.text = "";
-          maSoController.text = "";
           noidung.text = "";
           thanhtien.text = "";
 
@@ -2108,10 +2251,8 @@ class _ThemDoanhThuLamSanScreenState extends State<themdoanhthulamsan> {
         } else {
           print("Error!");
         }
-      } catch (e) {
-        print(e);
       }
-  }
+  
 
   String combinedKhachHangMaSoTemp = "";
   String combinedKhachHangMaSoTemp1 = "";
@@ -2145,7 +2286,6 @@ class _ThemDoanhThuLamSanScreenState extends State<themdoanhthulamsan> {
                     fontWeight: FontWeight.w600
                   ),
                   
-                suffix: Text('-'),
                 //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
                 filled: true,
                  fillColor: Colors.white,  // Bật chế độ đổ màu nền
@@ -2169,43 +2309,7 @@ class _ThemDoanhThuLamSanScreenState extends State<themdoanhthulamsan> {
             ),
             
 
-            SizedBox(height: 10),
-           TextFormField(
-             style: TextStyle(
-                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
-              ),
-              controller: maSoController,
-              keyboardType: TextInputType.number, // Đặt kiểu bàn phím cho TextInput
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Chỉ cho phép nhập số
-              decoration: InputDecoration(
-                labelText: 'Mã số',
-                  labelStyle: TextStyle(
-                    color: Color.fromARGB(255, 81, 196, 85),
-                    fontFamily: 'SFUFUTURABOOK',
-                    fontWeight: FontWeight.w600
-                  ),
-                suffix: Text('-'),
-                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
-                filled: true,
-                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
-                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
-                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
-                ),
-               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
-              ),
-                      focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
-            ),
-              disabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
-    ),
-              ),
-            ),
+           
         SizedBox(height: 20),
           TextFormField(
              style: TextStyle(
@@ -4896,7 +5000,6 @@ class VatLieuData {
   String Thoigiannhapphieu;
   String Tensanpham;
   String Tondaungay;
-  String Khachhangmaso;
   String Soluongsudung;
  String Conlaicuoingay;
  String idChitietphieuvatlieu;
@@ -4906,7 +5009,6 @@ class VatLieuData {
     required this.Thoigiannhapphieu,
     required this.Tensanpham,
     required this.Tondaungay,
-    required this.Khachhangmaso,
     required this.Soluongsudung,
     required this.Conlaicuoingay,
     required this.idChitietphieuvatlieu,
@@ -4948,7 +5050,6 @@ class _chitietphieuvatlieuState extends State<chitietphieuvatlieu> {
               Thoigiannhapphieu: item['Thoigiannhapphieu'],
               Tensanpham: item['Tensp'],
               Tondaungay: item['Tondaungay'],
-              Khachhangmaso: item['KhachangMaso'],
               Soluongsudung: item['Soluongsudung'],
               Conlaicuoingay: item['Conlaicuoingay'], 
             )).toList();
@@ -4967,7 +5068,9 @@ class _chitietphieuvatlieuState extends State<chitietphieuvatlieu> {
 @override
 Widget build(BuildContext context) {
   double screenWidth = MediaQuery.of(context).size.width;
-  double columnWidthPercentage = screenWidth * 0.25; // Ví dụ: mỗi cột chiếm 25% màn hình
+  double columnWidthPercentage1 = screenWidth * 0.45; // Ví dụ: mỗi cột chiếm 25% màn hình
+  double columnWidthPercentage2 = screenWidth * 0.30;
+  double columnWidthPercentage3 = screenWidth * 0.25;
 
   return Scaffold(
     appBar: AppBar(
@@ -4987,12 +5090,9 @@ Widget build(BuildContext context) {
             Table(
               border: TableBorder.all(), // Đường viền cho bảng
               columnWidths: {
-                0: FixedColumnWidth(columnWidthPercentage), // Độ rộng cột 0
-                1: FixedColumnWidth(columnWidthPercentage), // Độ rộng cột 1
-                2: FixedColumnWidth(columnWidthPercentage), // Độ rộng cột 2
-                3: FixedColumnWidth(columnWidthPercentage),
-                4: FixedColumnWidth(columnWidthPercentage), 
-                5: FixedColumnWidth(columnWidthPercentage), // Độ rộng cột 3 
+                0: FixedColumnWidth(columnWidthPercentage1), // Độ rộng cột 0
+                1: FixedColumnWidth(columnWidthPercentage2), // Độ rộng cột 1
+                2: FixedColumnWidth(columnWidthPercentage3), // Độ rộng cột 2
               },
               defaultVerticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
               children: [
@@ -5008,24 +5108,12 @@ Widget build(BuildContext context) {
                         ),
                       ),
                     ),
-                    TableCell(
-                      child: Container(
-                        padding: EdgeInsets.all(8),
-                       // Màu nền
-                        child: Text(
-                          'Nhận trong ngày',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                     
-                    
                        TableCell(
                       child: Container(
                         padding: EdgeInsets.all(8),
                         // Màu nền
                         child: Text(
-                          'Còn lại cuối ngày',
+                          'Số lượng sử dụng',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -5058,17 +5146,10 @@ Widget build(BuildContext context) {
                         verticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding tùy chỉnh
-                          child: Text(item.Tondaungay),
+                          child: Text(item.Soluongsudung),
                         ),
                       ),
-                     
-                        TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle, // Căn giữa theo chiều dọc
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding tùy chỉnh
-                          child: Text(item.Conlaicuoingay),
-                        ),
-                      ),
+
                        TableCell(
                             verticalAlignment: TableCellVerticalAlignment.middle,
                             child: Container(
@@ -5121,7 +5202,7 @@ Future<void> _showEditDialog(BuildContext context, VatLieuData vatlieu) async {
   TextEditingController _thoiGianController = TextEditingController(text: vatlieu.Thoigiannhapphieu);
   TextEditingController _tenSPController = TextEditingController(text: vatlieu.Tensanpham);
   TextEditingController _tonDauNgayController = TextEditingController(text: vatlieu.Tondaungay);
-  TextEditingController _KHMSController = TextEditingController(text: vatlieu.Khachhangmaso);
+ 
   TextEditingController _soLuongSDController = TextEditingController(text: vatlieu.Soluongsudung);
   TextEditingController _conLaiController = TextEditingController(text: vatlieu.Conlaicuoingay);
 
@@ -5147,10 +5228,7 @@ Future<void> _showEditDialog(BuildContext context, VatLieuData vatlieu) async {
                 controller: _tonDauNgayController,
                 decoration: InputDecoration(labelText: 'Nhận trong ngày'),
               ),
-              TextFormField(
-                controller: _KHMSController,
-                decoration: InputDecoration(labelText: 'Khách hàng - Mã số'),
-              ),
+              
                TextFormField(
                 controller: _soLuongSDController,
                 keyboardType: TextInputType.number, // Đặt kiểu bàn phím cho TextInput
@@ -5178,7 +5256,6 @@ Future<void> _showEditDialog(BuildContext context, VatLieuData vatlieu) async {
               String thoiGianMoi = _thoiGianController.text;
               String tenSPMoi = _tenSPController.text;
               String tonDauNgayMoi = _tonDauNgayController.text;
-              String KHMSMoi = _KHMSController.text;
               String soLuongSDMoi = _soLuongSDController.text;
               String conlaiMoi = _conLaiController.text;
             
@@ -5189,7 +5266,6 @@ Future<void> _showEditDialog(BuildContext context, VatLieuData vatlieu) async {
                 'thoiGian': thoiGianMoi,
                 'tenSP': tenSPMoi,
                 'tondaungay': tonDauNgayMoi,
-                'KHMS': KHMSMoi,
                 'soLuong': soLuongSDMoi,
                 'conlai': conlaiMoi,
               };
@@ -5238,7 +5314,6 @@ class _ThemVatLieuScreenState extends State<themvatlieu>{
         TextEditingController thoigiannhapphieu = TextEditingController();
         TextEditingController tensanpham = TextEditingController();
         TextEditingController tondaungay = TextEditingController();
-        TextEditingController khachhangmaso = TextEditingController();
         TextEditingController soluongsudung = TextEditingController();
         TextEditingController conlaicuoingay = TextEditingController();
 
@@ -5274,7 +5349,7 @@ final TextEditingController textEditingController = TextEditingController();
   }
   Future<void> insertrecordvatlieu(String idPhieuvatlieu) async {
     
-    if(tensanpham.text!="" || tondaungay.text!= "" || soluongsudung.text!=""||conlaicuoingay.text!=""||khachhangmaso!=""){
+    if(tensanpham.text!="" || tondaungay.text!= "" || soluongsudung.text!=""||conlaicuoingay.text!=""){
       try{
 
         String uri = "http://duongthangne.000webhostapp.com/vatlieu.php";
@@ -5285,7 +5360,6 @@ final TextEditingController textEditingController = TextEditingController();
             "tensp":selectedValue,
             "donvi":donvi.text,
             "tondaungay":tondaungay.text,
-            "khachhangmaso":khachhangmaso.text,
             "soluongsudung":soluongsudung.text,
             "conlaicuoingay":conlaicuoingay.text,    
         });
@@ -5296,7 +5370,6 @@ final TextEditingController textEditingController = TextEditingController();
           
           
           tondaungay.text= "";
-          khachhangmaso.text= "";
 
           conlaicuoingay.text= "";
       
@@ -5340,6 +5413,16 @@ String getDonviForSelectedValue(String selectedValue) {
     return "Đơn vị không xác định"; // Hoặc giá trị mặc định khác
   }
 }
+
+void updateUsedQuantity() {
+  if (tondaungay.text.isNotEmpty && conlaicuoingay.text.isNotEmpty) {
+    int tonDauNgay = int.parse(tondaungay.text);
+    int conLaiCuoiNgay = int.parse(conlaicuoingay.text);
+    int usedQuantity = tonDauNgay - conLaiCuoiNgay;
+    soluongsudung.text = usedQuantity.toString();
+  }
+}
+
 
 
 Future<void> updateStockQuantity(String? vattuId) async {
@@ -5415,135 +5498,115 @@ Future<void> updateStockQuantity(String? vattuId) async {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
                         SizedBox(height: 20),
-        DropdownButtonHideUnderline(
-        child: DropdownButton2<String>(
-          isExpanded: true,
-          hint: Text(
-            'Chọn vật liệu',
-            style: TextStyle(
-              fontSize: 14,
-              color: Theme.of(context).hintColor,
-            ),
-            
-          ),
-          
-          items: tenvatlieuList
-    .map((item) => DropdownMenuItem(
-          value: item, // Đảm bảo rằng item có thuộc tính "value" phù hợp với giá trị bạn muốn sử dụng.
-          child: Text(
-            item,
-            style: const TextStyle(
-              fontSize: 14,
-            ),
-          ),
-        ))
-    .toList(),
-          value: selectedValue,
-         onChanged: (value) {
-  setState(() {
-    selectedValue = value;
-    // Tại đây, bạn kiểm tra xem `value` có null hay không
-    if (value != null) {
-      donvi.text = getDonviForSelectedValue(value);
-    }
-  });
-},
-          buttonStyleData: const ButtonStyleData(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            height: 40,
-            width: 200,
-          ),
-          
-          dropdownStyleData: const DropdownStyleData(
-            maxHeight: 200,
-          ),
-          menuItemStyleData: const MenuItemStyleData(
-            height: 40, 
-          ),
-          dropdownSearchData: DropdownSearchData(
-            searchController: textEditingController,
-            searchInnerWidgetHeight: 50,
-            searchInnerWidget: Container(
-              height: 50,
-              padding: const EdgeInsets.only(
-                top: 8,
-                bottom: 4,
-                right: 8,
-                left: 8,
-              ),
-              child: TextFormField(
-                expands: true,
-                maxLines: null,
-                controller: textEditingController,
-                decoration: InputDecoration(
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 8,
-                  ),
-                  hintText: 'Tìm kiếm vật liệu...',
-                  hintStyle: const TextStyle(fontSize: 12),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ),
-            searchMatchFn: (item, searchValue) {
-  final itemValue = item.value.toString().toLowerCase(); // Chuyển item thành chữ thường
-  final searchValueLower = searchValue.toLowerCase(); // Chuyển searchValue thành chữ thường
-  return itemValue.contains(searchValueLower);
-},
-          ),
-          //This to clear the search value when you close the menu
-          onMenuStateChange: (isOpen) {
-            if (!isOpen) {
-              textEditingController.clear();
-            }
-          },
+    DropdownButtonHideUnderline(
+  child: Container(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(8),
+      border: Border.all(
+        color: Color.fromARGB(255, 81, 196, 85), // Border color
+      ),
+    ),
+    child: DropdownButton2<String>(
+      isExpanded: true,
+      hint: Text(
+        'Chọn vật liệu',
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.purple, // Text color
+          fontWeight: FontWeight.bold, // Text style - bold
         ),
       ),
-      TextFormField(
-             style: TextStyle(
-                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
-              ),
-              controller: donvi,
-              decoration: InputDecoration(
-                labelText: 'Đơn vị',
-                  labelStyle: TextStyle(
-                    color: Color.fromARGB(255, 81, 196, 85),
-                    fontFamily: 'SFUFUTURABOOK',
-                    fontWeight: FontWeight.w600
+      items: tenvatlieuList
+          .map((item) => DropdownMenuItem(
+                value: item,
+                child: Text(
+                  item,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.purple, // Text color
+                    fontWeight: FontWeight.bold, // Text style - bold
                   ),
-                filled: true,
-                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
-                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
-                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
                 ),
-               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
+              ))
+          .toList(),
+      value: selectedValue,
+      onChanged: (value) {
+        setState(() {
+          selectedValue = value;
+          if (value != null) {
+            donvi.text = getDonviForSelectedValue(value);
+          }
+        });
+      },
+      buttonStyleData: const ButtonStyleData(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        height: 40,
+        width: 200,
+      ),
+      dropdownStyleData: const DropdownStyleData(
+        maxHeight: 200,
+      ),
+      menuItemStyleData: const MenuItemStyleData(
+        height: 40,
+      ),
+      dropdownSearchData: DropdownSearchData(
+        searchController: textEditingController,
+        searchInnerWidgetHeight: 50,
+        searchInnerWidget: Container(
+          height: 50,
+          padding: const EdgeInsets.only(
+            top: 8,
+            bottom: 4,
+            right: 8,
+            left: 8,
+          ),
+          child: TextFormField(
+            expands: true,
+            maxLines: null,
+            controller: textEditingController,
+            decoration: InputDecoration(
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 8,
               ),
-                      focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
+              hintText: 'Tìm kiếm vật liệu...',
+              hintStyle: TextStyle(
+                fontSize: 12,
+                color: Colors.purple, // Text color
+                fontWeight: FontWeight.bold, // Text style - bold
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: Color.fromARGB(255, 81, 196, 85), // Border color
+                ),
+              ),
             ),
-              disabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
+          ),
+        ),
+        searchMatchFn: (item, searchValue) {
+          final itemValue = item.value.toString().toLowerCase();
+          final searchValueLower = searchValue.toLowerCase();
+          return itemValue.contains(searchValueLower);
+        },
+      ),
+      onMenuStateChange: (isOpen) {
+        if (!isOpen) {
+          textEditingController.clear();
+        }
+      },
     ),
-              ),
-              enabled: false,
-            ),
-
-         
+  ),
+),       
                         SizedBox(height: 20),
           TextFormField(
              style: TextStyle(
                 color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
               ),
               controller: tondaungay,
+              keyboardType: TextInputType.number, // Đặt kiểu bàn phím cho TextInput
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Chỉ cho phép nhập số
               decoration: InputDecoration(
                 labelText: 'Nhận trong ngày',
                   labelStyle: TextStyle(
@@ -5552,7 +5615,6 @@ Future<void> updateStockQuantity(String? vattuId) async {
                     fontWeight: FontWeight.w600
                   ),
                   
-                suffix: Text('-'),
                 //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
                 filled: true,
                  fillColor: Colors.white,  // Bật chế độ đổ màu nền
@@ -5573,22 +5635,27 @@ Future<void> updateStockQuantity(String? vattuId) async {
                 borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
     ),
               ),
+              onChanged: (value) {
+                updateUsedQuantity();
+              },
             ),
                          SizedBox(height: 20),
+                          
           TextFormField(
              style: TextStyle(
                 color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
               ),
-              controller: khachhangmaso,
+              controller: conlaicuoingay,
+              keyboardType: TextInputType.number, // Đặt kiểu bàn phím cho TextInput
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Chỉ cho phép nhập số
               decoration: InputDecoration(
-                labelText: 'Khách hàng - Mã số',
+                labelText: 'Còn lại cuối ngày',
                   labelStyle: TextStyle(
                     color: Color.fromARGB(255, 81, 196, 85),
                     fontFamily: 'SFUFUTURABOOK',
                     fontWeight: FontWeight.w600
                   ),
                   
-                suffix: Text('-'),
                 //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
                 filled: true,
                  fillColor: Colors.white,  // Bật chế độ đổ màu nền
@@ -5609,8 +5676,11 @@ Future<void> updateStockQuantity(String? vattuId) async {
                 borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
     ),
               ),
+               onChanged: (value) {
+                updateUsedQuantity();
+              },
             ),
-                        SizedBox(height: 20),
+        SizedBox(height: 20),
           TextFormField(
              style: TextStyle(
                 color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
@@ -5647,48 +5717,8 @@ Future<void> updateStockQuantity(String? vattuId) async {
     ),
               ),
             ),
-                         SizedBox(height: 20),
-          TextFormField(
-             style: TextStyle(
-                color: Color.fromARGB(255, 81, 196, 85) , // Màu văn bản khi nhập vào
-              ),
-              controller: conlaicuoingay,
-              decoration: InputDecoration(
-                labelText: 'Còn lại cuối ngày',
-                  labelStyle: TextStyle(
-                    color: Color.fromARGB(255, 81, 196, 85),
-                    fontFamily: 'SFUFUTURABOOK',
-                    fontWeight: FontWeight.w600
-                  ),
-                  
-                suffix: Text('-'),
-                //fillColor: Color.fromARGB(255, 81, 196, 85), // Màu nền của input
-                filled: true,
-                 fillColor: Colors.white,  // Bật chế độ đổ màu nền
-                 border: OutlineInputBorder( // Sử dụng OutlineInputBorder để tạo border radius
-                  borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                  borderSide: BorderSide.none, // Ẩn dòng line ở dưới
-                ),
-               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi không focus
-              ),
-                      focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi focus
-            ),
-              disabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0), // Đặt giá trị border radius
-                borderSide: BorderSide(color: Color.fromARGB(255, 81, 196, 85)), // Màu border khi bị disable
-    ),
-              ),
-            ),
-          
-            // TextFormField(
-            //   controller: ngaynhapphieu,
-            //   decoration: InputDecoration(labelText: 'Ngay nhap phieu'),
-            //   enabled: false,
-            // ),
+                        
+
            SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
